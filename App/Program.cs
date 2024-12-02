@@ -26,11 +26,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql
 builder.Services.AddScoped<ProductService>();
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(); 
-    ApplicationDbContext.TestDatabaseConnection(context);
-}
+//using (var scope = app.Services.CreateScope())
+//{
+//    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(); 
+//    ApplicationDbContext.TestDatabaseConnection(context);
+//}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
