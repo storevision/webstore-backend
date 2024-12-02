@@ -23,4 +23,19 @@ public class CartService
         Product product = new Product();
         return product;
     }
+
+    public static void calculateTotalPrice(Order order)
+    {
+        float? amount = 0;
+        
+        foreach (var articleAndQuantity in order.articleList )
+        {
+            foreach (var article in articleAndQuantity.Value)
+            {
+                amount += article.Value.ProductPrice * article.Key;
+            }
+            
+        }
+        order.setTotalAmount(amount);
+    }
 }

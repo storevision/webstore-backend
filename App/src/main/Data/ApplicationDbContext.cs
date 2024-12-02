@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Webshop.App.src.main.Models;
 using Webshop.Models.Cart;
 using Webshop.Models.Products;
 
@@ -10,6 +11,12 @@ public class ApplicationDbContext : DbContext
     
     public DbSet<Product> products { get; set; }
     public DbSet<Order> orders { get; set; }
+    public DbSet<Customer> customers { get; set; }
+    public DbSet<OderDetails> orderDetails { get; set; }
+    public DbSet<Payment> payments { get; set; }
+    public DbSet<Category> categories { get; set; }
+    
+    
     
     public static void TestDatabaseConnection(ApplicationDbContext context)
     {
