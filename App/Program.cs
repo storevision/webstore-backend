@@ -1,6 +1,7 @@
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Webshop.Models.DB;
+using Webshop.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer(); // Für Endpunkte erforderlich
 builder.Services.AddSwaggerGen(); // Swagger-Dienst hinzufügen
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
-
+builder.Services.AddScoped<ProductService>();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -41,6 +42,8 @@ if (app.Environment.IsDevelopment())
 
 // app.UseHttpsRedirection();
 app.MapControllers();
+//Der Methodenaufruf von ApplicationDbContext für eine sql abfrage
+
 
 Console.WriteLine("Die Anwendung wurde gestartet.");
 app.Run();
