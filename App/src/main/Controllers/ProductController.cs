@@ -8,6 +8,9 @@ namespace Webshop.Controllers;
 [Route("Products")]
 public class ProductController : ControllerBase
 {
+    /**
+     * Hier wird eine Variable erzeugt in welcher der ProductService injekted wird
+     */
     private readonly ProductService _productService;
 
     public ProductController(ProductService productService)
@@ -34,7 +37,7 @@ public class ProductController : ControllerBase
     public async Task<IActionResult> CreateProduct(Product product)
     {
         await _productService.AddProductAsync(product);
-        return CreatedAtAction(nameof(GetProductById), new { id = product.productid }, product);
+        return CreatedAtAction(nameof(GetProductById), new { id = product.ProductId }, product);
     }
 
     [HttpDelete("{id}")]

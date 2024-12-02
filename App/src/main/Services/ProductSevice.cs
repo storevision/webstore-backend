@@ -12,8 +12,7 @@ public class ProductService
     {
         _context = context;
     }
-
-    // Methode: Alle Produkte abrufen
+    
     public async Task<List<Product>> GetAllProductsAsync()
     {
         return await _context.products.ToListAsync();
@@ -22,7 +21,7 @@ public class ProductService
     // Methode: Produkt nach ID abrufen
     public async Task<Product?> GetProductByIdAsync(int id)
     {
-        return await _context.products.FirstOrDefaultAsync(p => p.productid == id);
+        return await _context.products.FirstOrDefaultAsync(p => p.ProductId == id);
     }
 
     // Methode: Neues Produkt hinzufügen
@@ -33,9 +32,20 @@ public class ProductService
     }
 
     // Methode: Produkt löschen
+    /// <summary>
+    ///     Asynchronously deletes a product from the database by its ID.
+    /// </summary>
+    /// <remarks>
+    ///     Use <see langword="await" /> to ensure asynchronous operations are completed before calling other methods
+    ///     on the same <see cref="DbContext" />. See 
+    ///     <see href="https://aka.ms/efcore-docs-threading">EF Core threading issues</see> for details.
+    /// </remarks>
+    /// <param name="id">The ID of the product to delete.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public async Task DeleteProductAsync(int id)
     {
-        var product = await _context.products.FirstOrDefaultAsync(p => p.productid == id);
+        
+        var product = await _context.products.FirstOrDefaultAsync(p => p.ProductId == id);
         if (product != null)
         {
             _context.products.Remove(product);
