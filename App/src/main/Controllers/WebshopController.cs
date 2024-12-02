@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Webshop.Services;
 
 namespace Webshop.Controllers
 {
@@ -6,6 +7,7 @@ namespace Webshop.Controllers
     [Route("api/Webshop")] // Basis-Route: api/My
     public class WebshopController : ControllerBase
     {
+        ProductService _productService;
         // GET: api/Webshop
         [HttpGet]
         public IActionResult Get()
@@ -26,5 +28,7 @@ namespace Webshop.Controllers
         {
             return Created("", new { message = "Item created!", data });
         }
+
+        // STrg Z
     }
 }
