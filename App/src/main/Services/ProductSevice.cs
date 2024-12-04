@@ -24,6 +24,16 @@ public class ProductService
         return await _context.products.FirstOrDefaultAsync(p => p.ProductId == id);
     }
 
+    public Product CreateProduct(string name, string description, decimal price)
+    {
+        Product product = new Product();
+        product.ProductName = name;
+        product.ProductDescription = description;
+        product.ProductPrice = price;
+        AddProductAsync(product);
+        return product;
+    }
+
     // Methode: Neues Produkt hinzufügen
     public async Task AddProductAsync(Product product)
     {
