@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Webshop.App.src.main.Models;
 using Webshop.Services;
 using Webshop.Models.Products;
 
@@ -21,23 +22,36 @@ public class ProductController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetProducts()
     {
-        var products = await _productService.GetAllProductsAsync();
-        return Ok(products);
+        List<Product> products = await _productService.GetAllProductsAsync();
+        
+        if (products == null)
+        {
+            return NotFound();
+        }
+        else
+        {
+            CreatedResponse<Product> createdResponse = new CreatedResponse<Product>();
+            createdResponse.createResponse(true, products);
+            return Ok(createdResponse);
+        }
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetProductById(int id)
     {
         var product = await _productService.GetProductByIdAsync(id);
-        if (product == null) return NotFound();
+        if (product == null)
+        {
+            return NotFound();
+        }
         return Ok(product);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateProduct(Product product)
+    public async Task<IActionResult> Add([FromForm] string name, [FromForm] string description, [FromForm] decimal price)
     {
-        await _productService.AddProductAsync(product);
-        return CreatedAtAction(nameof(GetProductById), new { id = product.ProductId }, product);
+        Product product = _productService.CreateProduct(name, description, price);
+        return Ok(product);
     }
 
     [HttpDelete("{id}")]

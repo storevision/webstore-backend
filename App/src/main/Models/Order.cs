@@ -10,7 +10,7 @@ public class Order
 {
     [Key]
     public int OrderId { get; set; }
-    public float? TotalAmount { get; set; }
+    public decimal? TotalAmount { get; set; }
     public DateTime OrderDate { get; set; }
     [ForeignKey("CustomerId")]
     public int CustomerId { get; set; }
@@ -37,7 +37,7 @@ public class Order
         
     }
 
-    public void setTotalAmount(float? totalAmount)
+    public void setTotalAmount(decimal? totalAmount)
     {
         this.TotalAmount = totalAmount;
     }

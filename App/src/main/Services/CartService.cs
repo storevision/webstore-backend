@@ -26,7 +26,7 @@ public class CartService
 
     public static void calculateTotalPrice(Order order)
     {
-        float? amount = 0;
+        decimal? amount = 0;
         
         foreach (var articleAndQuantity in order.articleList )
         {
