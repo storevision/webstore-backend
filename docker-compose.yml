@@ -6,6 +6,8 @@ services:
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     env_file: "backend.env"
+    networks:
+      - cs_backend
 
   webapp:
     ports:
@@ -13,3 +15,37 @@ services:
     env_file: "backend.env"
     build:
       context: .
+    networks:
+      - cs_backend
+
+  ci:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    working_dir: /app
+    env_file: "backend.env"
+    environment:
+      POSTGRES_HOST: db
+      CI: true
+    networks:
+      - cs_backend
+
+  webstore-playwright:
+    # volumes:
+    #   - ./playwright-report:/playwright-report
+    environment:
+      API_BASE_URL: http://ci:8080
+      CI: true
+    image: commanderred42/webstore-playwright
+    networks:
+      - cs_backend
+    ipc: host
+    cap_add:
+      - SYS_ADMIN
+    init: true
+
+networks:
+  cs_backend:
+    driver: bridge
