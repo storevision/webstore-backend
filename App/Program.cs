@@ -1,5 +1,6 @@
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Webshop.Models.DB;
 using Webshop.Services;
 
@@ -41,6 +42,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger(); // Swagger JSON-Dokument
     app.UseSwaggerUI(); // Swagger UI
 }
+
+// route for static data's defined with "/api/assets/"
+app.UseStaticFiles();
+app.MapWhen(context => context.Request.Path.StartsWithSegments("/api/assets"), subApp =>
+{
+    subApp.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(
+            Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/assets")),
+        RequestPath = "/api/assets"
+    });
+});
 
 // app.UseHttpsRedirection();
 app.MapControllers();
