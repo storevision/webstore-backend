@@ -32,7 +32,7 @@ public class CartService
         {
             foreach (var article in articleAndQuantity.Value)
             {
-                amount += article.Value.ProductPrice * article.Key;
+                amount += article.Value.ProductPricePerUnit * article.Key;
             }
             
         }
