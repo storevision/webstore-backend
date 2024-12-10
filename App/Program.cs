@@ -25,6 +25,7 @@ builder.Services.AddSwaggerGen(); // Swagger-Dienst hinzufügen
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<CategorieService>();
 var app = builder.Build();
 
 //using (var scope = app.Services.CreateScope())
