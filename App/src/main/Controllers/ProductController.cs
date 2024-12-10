@@ -6,7 +6,7 @@ using Webshop.Models.Products;
 namespace Webshop.Controllers;
 
 [ApiController]
-[Route("Products")]
+[Route("products")]
 public class ProductController : ControllerBase
 {
     /**
@@ -20,6 +20,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet]
+    [Route("list")]
     public async Task<IActionResult> GetProducts()
     {
         List<Product> products = await _productService.GetAllProductsAsync();
