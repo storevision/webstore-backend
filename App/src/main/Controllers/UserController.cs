@@ -5,7 +5,7 @@ using Webshop.Services;
 namespace Webshop.Controllers;
 
 [ApiController]
-[Route("api/User")]
+[Route("users")]
 public class UserController : ControllerBase
 {
 
@@ -17,7 +17,7 @@ public class UserController : ControllerBase
     }
     
     [HttpPost]
-    [Route("Register")]
+    [Route("register")]
     public async Task<IActionResult> CreateUser([FromForm] string email, [FromForm] string password, [FromForm] string firstName, [FromForm] string lastName, [FromForm] string address, [FromForm] string phoneNumber)
     {
         _userService.CreateUser(firstName, lastName, email, phoneNumber, address, password);
@@ -25,7 +25,7 @@ public class UserController : ControllerBase
     }
     
     [HttpPost]
-    [Route("Login")]
+    [Route("login")]
     public async Task<IActionResult> Login([FromForm] string email, [FromForm] string password)
     {
         bool loginOk = _userService.Login(email, password);
@@ -37,6 +37,14 @@ public class UserController : ControllerBase
         {
             return BadRequest("Login Fail");
         }
+    }
+    
+    [HttpGet]
+    [Route("info")]
+    public async Task<IActionResult> Info()
+    {
+        var response = new { message = "Login Ok" };
+        return StatusCode(201, response);
     }
     
     
