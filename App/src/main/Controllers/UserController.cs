@@ -15,16 +15,16 @@ public class UserController : ControllerBase
     }
     
     [HttpPost]
-    [Route("Register")]
-    public Task<IActionResult> CreateUser([FromForm] string email, [FromForm] string password, [FromForm] string displayName)
+    [Route("register")]
+    public async Task<IActionResult> CreateUser([FromForm] string email, [FromForm] string password, [FromForm] string firstName, [FromForm] string lastName, [FromForm] string address, [FromForm] string phoneNumber)
     {
         _userService.CreateUser(email, password, displayName);
         return Task.FromResult<IActionResult>(Ok());
     }
     
     [HttpPost]
-    [Route("Login")]
-    public Task<IActionResult> Login([FromForm] string email, [FromForm] string password)
+    [Route("login")]
+    public async Task<IActionResult> Login([FromForm] string email, [FromForm] string password)
     {
         bool loginOk = _userService.Login(email, password);
 
