@@ -35,6 +35,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
     - name: Verify docker is installed
       id: docker-version
       continue-on-error: true
@@ -59,6 +62,7 @@ jobs:
       run: |
           sudo service docker start
           sudo docker ps
+          touch results.json
 
     - name: Start service db
       run: docker compose -f docker-compose.yml up -d db
@@ -72,6 +76,16 @@ jobs:
               sleep 1
           done
 
+    - name: Build service "ci"
+      id: push
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        file: ./Dockerfile
+        push: false
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
     - name: Start service "ci"
       run: docker compose -f docker-compose.yml up -d ci
 
@@ -84,6 +98,11 @@ jobs:
 
     - name: Run Playwright tests from commanderred42/webstore-playwright
       run: docker compose -f docker-compose.yml run webstore-playwright
+
+    - uses: daun/playwright-report-summary@v3
+      if: ${{ !cancelled() }}
+      with:
+        report-file: results.json
 
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
