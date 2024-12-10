@@ -4,7 +4,7 @@ using Webshop.App.src.main.Services;
 namespace Webshop.App.src.main.Controllers;
 
 [ApiController]
-[Route("api/User")]
+[Route("users")]
 public class UserController : ControllerBase
 {
     private readonly UserService _userService;
@@ -36,4 +36,14 @@ public class UserController : ControllerBase
             return Task.FromResult<IActionResult>(BadRequest("Login Fail"));
         }
     }
+    
+    [HttpGet]
+    [Route("info")]
+    public async Task<IActionResult> Info()
+    {
+        var response = new { message = "Login Ok" };
+        return StatusCode(201, response);
+    }
+    
+    
 }
