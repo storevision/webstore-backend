@@ -29,7 +29,7 @@ public class ProductService
         Product product = new Product();
         product.ProductName = name;
         product.ProductDescription = description;
-        product.ProductPrice = price;
+        product.ProductPricePerUnit = price;
         AddProductAsync(product);
         return product;
     }
