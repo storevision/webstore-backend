@@ -12,7 +12,7 @@ using Webshop.Models.DB;
 namespace Webshop.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241211080657_001-firstdbmig")]
+    [Migration("20241211113717_001-firstdbmig")]
     partial class _001firstdbmig
     {
         /// <inheritdoc />
@@ -27,21 +27,44 @@ namespace Webshop.Migrations
 
             modelBuilder.Entity("Webshop.App.src.main.Models.Category", b =>
                 {
-                    b.Property<int>("CategoryID")
+                    b.Property<int>("CategoryId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CategoryID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CategoryId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.HasKey("CategoryID");
+                    b.HasKey("CategoryId");
 
                     b.ToTable("categories");
+                });
+
+            modelBuilder.Entity("Webshop.App.src.main.Models.Inventory", b =>
+                {
+                    b.Property<int>("InventoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("InventoryId"));
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.HasKey("InventoryId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("inventory");
                 });
 
             modelBuilder.Entity("Webshop.App.src.main.Models.OderDetails", b =>
@@ -170,9 +193,6 @@ namespace Webshop.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ProductId"));
 
-                    b.Property<int>("CategoryID")
-                        .HasColumnType("integer");
-
                     b.Property<string>("ProductBlurredImage")
                         .IsRequired()
                         .HasColumnType("text")
@@ -205,11 +225,25 @@ namespace Webshop.Migrations
                         .HasColumnType("decimal(5, 2)")
                         .HasColumnName("price_per_unit");
 
+                    b.Property<int>("category_id")
+                        .HasColumnType("integer");
+
                     b.HasKey("ProductId");
 
-                    b.HasIndex("CategoryID");
+                    b.HasIndex("category_id");
 
                     b.ToTable("products");
+                });
+
+            modelBuilder.Entity("Webshop.App.src.main.Models.Inventory", b =>
+                {
+                    b.HasOne("Webshop.Models.Products.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Webshop.App.src.main.Models.OderDetails", b =>
@@ -242,7 +276,7 @@ namespace Webshop.Migrations
                 {
                     b.HasOne("Webshop.App.src.main.Models.Category", "Category")
                         .WithMany()
-                        .HasForeignKey("CategoryID")
+                        .HasForeignKey("category_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

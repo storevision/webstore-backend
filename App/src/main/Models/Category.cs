@@ -9,7 +9,7 @@ public class Category
 {
     [Key]
     [Column("id")]
-    public int CategoryID { get; set; }
+    public int CategoryId { get; set; }
     [Required]
     [Column("name")]
     public string Name { get; set; }
