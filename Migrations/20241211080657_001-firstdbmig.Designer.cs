@@ -12,8 +12,8 @@ using Webshop.Models.DB;
 namespace Webshop.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241203121100_InitialCreate4")]
-    partial class InitialCreate4
+    [Migration("20241211080657_001-firstdbmig")]
+    partial class _001firstdbmig
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,55 +29,19 @@ namespace Webshop.Migrations
                 {
                     b.Property<int>("CategoryID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CategoryID"));
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("name");
 
                     b.HasKey("CategoryID");
 
                     b.ToTable("categories");
-                });
-
-            modelBuilder.Entity("Webshop.App.src.main.Models.Customer", b =>
-                {
-                    b.Property<int>("CustomerID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CustomerID"));
-
-                    b.Property<string>("Address")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("text");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("text");
-
-                    b.HasKey("CustomerID");
-
-                    b.ToTable("customers");
                 });
 
             modelBuilder.Entity("Webshop.App.src.main.Models.OderDetails", b =>
@@ -135,6 +99,41 @@ namespace Webshop.Migrations
                     b.ToTable("payments");
                 });
 
+            modelBuilder.Entity("Webshop.App.src.main.Models.User", b =>
+                {
+                    b.Property<int>("CustomerID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CustomerID"));
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("display_name");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("email");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("PasswordChangedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("password_changed_at");
+
+                    b.HasKey("CustomerID");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("users");
+                });
+
             modelBuilder.Entity("Webshop.Models.Cart.Order", b =>
                 {
                     b.Property<int>("OrderId")
@@ -152,9 +151,12 @@ namespace Webshop.Migrations
                     b.Property<decimal?>("TotalAmount")
                         .HasColumnType("numeric");
 
+                    b.Property<int?>("UserCustomerID")
+                        .HasColumnType("integer");
+
                     b.HasKey("OrderId");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("UserCustomerID");
 
                     b.ToTable("orders");
                 });
@@ -163,21 +165,49 @@ namespace Webshop.Migrations
                 {
                     b.Property<int>("ProductId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ProductId"));
 
+                    b.Property<int>("CategoryID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ProductBlurredImage")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("blurred_image");
+
+                    b.Property<int>("ProductBlurredImageHeight")
+                        .HasColumnType("integer")
+                        .HasColumnName("blurred_image_height");
+
+                    b.Property<int>("ProductBlurredImageWidth")
+                        .HasColumnType("integer")
+                        .HasColumnName("blurred_image_width");
+
                     b.Property<string>("ProductDescription")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<string>("ProductImage")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("image_url");
 
                     b.Property<string>("ProductName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("name");
 
-                    b.Property<decimal?>("ProductPrice")
-                        .HasColumnType("numeric");
+                    b.Property<decimal>("ProductPricePerUnit")
+                        .HasColumnType("decimal(5, 2)")
+                        .HasColumnName("price_per_unit");
 
                     b.HasKey("ProductId");
+
+                    b.HasIndex("CategoryID");
 
                     b.ToTable("products");
                 });
@@ -203,14 +233,23 @@ namespace Webshop.Migrations
 
             modelBuilder.Entity("Webshop.Models.Cart.Order", b =>
                 {
-                    b.HasOne("Webshop.App.src.main.Models.Customer", null)
+                    b.HasOne("Webshop.App.src.main.Models.User", null)
                         .WithMany("Orders")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserCustomerID");
                 });
 
-            modelBuilder.Entity("Webshop.App.src.main.Models.Customer", b =>
+            modelBuilder.Entity("Webshop.Models.Products.Product", b =>
+                {
+                    b.HasOne("Webshop.App.src.main.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Webshop.App.src.main.Models.User", b =>
                 {
                     b.Navigation("Orders");
                 });
