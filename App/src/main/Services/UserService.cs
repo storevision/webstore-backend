@@ -1,9 +1,7 @@
-﻿using System.Security.Cryptography;
-using Webshop.App.src.main.Models;
-using Webshop.Models;
+﻿using Webshop.App.src.main.Models;
 using Webshop.Models.DB;
 
-namespace Webshop.Services;
+namespace Webshop.App.src.main.Services;
 
 public class UserService
 {
@@ -13,22 +11,22 @@ public class UserService
     {
         _context = context;
     }
-
-    public void CreateUser(string firstName, string lastName, string email, string? phone, string? address, string password)
+    
+    public void CreateUser(string email, string password, string displayName)
     {
-        Customer customer = new Customer(firstName, lastName, email, phone, address, password);
-        _context.customers.Add(customer);
+        User user = new User(email, password, displayName);
+        _context.users.Add(user);
         _context.SaveChanges();
     }
 
     public bool Login(string email, string password)
     {
-        List<Customer> customers = _context.customers
+        List<User> customers = _context.users
                 .Where(x => x.Email == email)
                 .ToList();
         
-        Customer customer = customers.FirstOrDefault();
-        if (!customer.VerifyPassword(password))
+        User user = customers.FirstOrDefault();
+        if (user != null && !user.VerifyPassword(password))
         {
             throw(new Exception("Password verification failed"));
             return false;
