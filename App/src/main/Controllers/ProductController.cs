@@ -23,18 +23,30 @@ public class ProductController : ControllerBase
     [Route("list")]
     public async Task<IActionResult> GetProducts()
     {
-        List<Product> products = await _productService.GetAllProductsAsync();
+        CreatedResponse<Product> createdResponse = new CreatedResponse<Product>
+        {
+            success = false
+        };
         
-        if (products == null)
+        try
         {
-            return NotFound();
-        }
-        else
-        {
-            CreatedResponse<Product> createdResponse = new CreatedResponse<Product>();
-            createdResponse.createResponse(true, products);
+            List<Product> products = await _productService.GetAllProductsAsync();
+            
+            createdResponse.createSuccessListResponse(true, products);
             return Ok(createdResponse);
+            
         }
+        catch (Exception e)
+        {
+            createdResponse.createErrorResponse(false, e.Message);
+            return BadRequest(createdResponse);
+
+        }
+        
+        
+        
+        
+        
     }
 
     [HttpGet("{id}")]

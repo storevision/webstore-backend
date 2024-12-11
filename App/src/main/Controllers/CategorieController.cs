@@ -21,8 +21,11 @@ public class CategorieController : ControllerBase
     public async Task<IActionResult> GetCategories()
     {
         List<Category> categories = await _categorieService.GetAllCategoriesAsync();
-        CreatedResponse<Category> categoriesResponse = new CreatedResponse<Category>();;
-        categoriesResponse.createResponse(true, categories);
+        CreatedResponse<Category> categoriesResponse = new CreatedResponse<Category>()
+        {
+            success = false
+        };
+        categoriesResponse.createSuccessListResponse(true, categories);
         return Ok(categoriesResponse);
     }
 }

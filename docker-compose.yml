@@ -11,7 +11,7 @@ services:
 
   webapp:
     ports:
-      - "8080:8080"
+      - "8070:8070"
     env_file: "backend.env"
     build:
       context: .
@@ -38,7 +38,7 @@ services:
       - ./results.json:/app/results.json
     environment:
       API_BASE_URL: http://ci:8080
-      CI: true
+      # CI: true
     image: commanderred42/webstore-playwright
     networks:
       - cs_backend

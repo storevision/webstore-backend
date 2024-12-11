@@ -5,13 +5,35 @@ namespace Webshop.App.src.main.Models;
 
 public class CreatedResponse<T>
 {
-    public bool success { get; set; }
-    public List<T> data { get; set; }
+    public required bool success { get; set; }
+    public List<T>? data { get; set; }
+    public T? result { get; set; }
     
-    public void createResponse(bool status, List<T> objList)
+    public string? error { get; set; }
+    
+    public void createSuccessListResponse(bool status, List<T> obj)
     {
         success = status;
-        data = objList;
+        if (status)
+        {
+            data = obj;
+        }
     }
+    public void createSuccessResponse(bool status, T obj)
+    {
+        success = status;
+        if (status)
+        {
+            result = obj;
+        }
+    }
+
+    public void createErrorResponse(bool status, string err)
+    {
+        success = status;
+        error = err;
+    }
+    
+    
 }
 
