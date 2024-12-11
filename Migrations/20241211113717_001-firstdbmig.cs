@@ -70,14 +70,14 @@ namespace Webshop.Migrations
                     blurred_image_width = table.Column<int>(type: "integer", nullable: false),
                     blurred_image_height = table.Column<int>(type: "integer", nullable: false),
                     price_per_unit = table.Column<decimal>(type: "numeric(5,2)", nullable: false),
-                    CategoryID = table.Column<int>(type: "integer", nullable: false)
+                    category_id = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_products", x => x.id);
                     table.ForeignKey(
-                        name: "FK_products_categories_CategoryID",
-                        column: x => x.CategoryID,
+                        name: "FK_products_categories_category_id",
+                        column: x => x.category_id,
                         principalTable: "categories",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -102,6 +102,26 @@ namespace Webshop.Migrations
                         column: x => x.UserCustomerID,
                         principalTable: "users",
                         principalColumn: "id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "inventory",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    quantity = table.Column<int>(type: "integer", nullable: false),
+                    ProductId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_inventory", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_inventory_products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -133,6 +153,11 @@ namespace Webshop.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_inventory_ProductId",
+                table: "inventory",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_orderDetails_OrderId",
                 table: "orderDetails",
                 column: "OrderId");
@@ -148,9 +173,9 @@ namespace Webshop.Migrations
                 column: "UserCustomerID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_products_CategoryID",
+                name: "IX_products_category_id",
                 table: "products",
-                column: "CategoryID");
+                column: "category_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_users_email",
@@ -162,6 +187,9 @@ namespace Webshop.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "inventory");
+
             migrationBuilder.DropTable(
                 name: "orderDetails");
 

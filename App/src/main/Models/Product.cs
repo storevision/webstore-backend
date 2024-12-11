@@ -36,6 +36,6 @@ public class Product
     [Column("price_per_unit", TypeName = "decimal(5, 2)")]
     public decimal ProductPricePerUnit { get; set; }
     
-    [ForeignKey("CategoryID")]
+    [ForeignKey("category_id")]
     public Category Category { get; set; }
 }
