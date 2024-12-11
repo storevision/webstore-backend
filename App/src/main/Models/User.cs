@@ -1,27 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.RegularExpressions;
-using BCrypt.Net;
 using Webshop.Models.Cart;
 
-namespace Webshop.Models
+namespace Webshop.App.src.main.Models
 {
-    [Table("customers")]
-    public class Customer
+    [Table("users")]
+    public class User
     {
         [Key]
+        [Column ("id")]
         public int CustomerID { get; set; }
-        public string FirstName { get; set; } = null!;
-        public string LastName { get; set; } = null!;
+        
+        [Required]
+        [Column ("email")] 
+        // UNIQUE!!!
         public string? Email { get; set; }
-        public string? Phone { get; set; }
-        public string? Address { get; set; }
+        
+        [Required]
+        [Column ("display_name")]
+        public string  DisplayName { get; set; }
 
+        [Required]
+        [Column("password_hash")]
         // Passwort wird als Hash gespeichert
-        private string passwordHash = string.Empty;
+        private string PasswordHash = string.Empty;
 
+        [Required]
+        [Column("password_changed_at")]
+        public DateTime  PasswordChangedAt { get; set; } = DateTime.Now;
+        
         public ICollection<Order>? Orders { get; set; } = null!;
 
         // Passwort-Property: nur zum Setzen
@@ -37,41 +44,40 @@ namespace Webshop.Models
                 // Prüfen, ob das Passwort bereits ein gültiger bcrypt-Hash ist
                 if (IsBcryptHash(value))
                 {
-                    passwordHash = value; // Bereits gehashter Wert wird übernommen
+                    PasswordHash = value; // Bereits gehashter Wert wird übernommen
                 }
                 else
                 {
                     // Neues Passwort wird gehasht und gespeichert
-                    passwordHash = BCrypt.Net.BCrypt.HashPassword(value);
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(value);
                 }
             }
-            get { return passwordHash; }
+            get => PasswordHash;
         }
 
         // Methode zum Überprüfen des Passworts
         public bool VerifyPassword(string plainPassword)
         {
-            if (string.IsNullOrWhiteSpace(passwordHash))
+            if (string.IsNullOrWhiteSpace(PasswordHash))
             {
                 throw new InvalidOperationException("Password hash is not set.");
             }
-            
             // Passwort prüfen
-            return BCrypt.Net.BCrypt.Verify(plainPassword, passwordHash);
+            return BCrypt.Net.BCrypt.Verify(plainPassword, PasswordHash);
         }
 
         // Parameterloser Konstruktor (wichtig für Entity Framework)
-        public Customer() { }
+        public User(string displayName)
+        {
+            DisplayName = displayName;
+        }
 
         // Konstruktor mit Initialisierung
-        public Customer(string firstName, string lastName, string email, string? phone, string? address, string password)
+        public User(string email, string password, string displayName)
         {
-            FirstName = firstName;
-            LastName = lastName;
             Email = email;
-            Phone = phone;
-            Address = address;
             Password = password;
+            DisplayName = displayName;
         }
         
         private static bool IsBcryptHash(string input)

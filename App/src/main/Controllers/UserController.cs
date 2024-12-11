@@ -1,14 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity.Data;
-using Microsoft.AspNetCore.Mvc;
-using Webshop.Services;
+﻿using Microsoft.AspNetCore.Mvc;
+using Webshop.App.src.main.Services;
 
-namespace Webshop.Controllers;
+namespace Webshop.App.src.main.Controllers;
 
 [ApiController]
 [Route("users")]
 public class UserController : ControllerBase
 {
-
     private readonly UserService _userService;
 
     public UserController(UserService userService)
@@ -17,25 +15,25 @@ public class UserController : ControllerBase
     }
     
     [HttpPost]
-    [Route("register")]
-    public async Task<IActionResult> CreateUser([FromForm] string email, [FromForm] string password, [FromForm] string firstName, [FromForm] string lastName, [FromForm] string address, [FromForm] string phoneNumber)
+    [Route("Register")]
+    public Task<IActionResult> CreateUser([FromForm] string email, [FromForm] string password, [FromForm] string displayName)
     {
-        _userService.CreateUser(firstName, lastName, email, phoneNumber, address, password);
-        return Ok();
+        _userService.CreateUser(email, password, displayName);
+        return Task.FromResult<IActionResult>(Ok());
     }
     
     [HttpPost]
-    [Route("login")]
-    public async Task<IActionResult> Login([FromForm] string email, [FromForm] string password)
+    [Route("Login")]
+    public Task<IActionResult> Login([FromForm] string email, [FromForm] string password)
     {
         bool loginOk = _userService.Login(email, password);
 
         if (loginOk)
         {
-            return Ok("Login Ok");
+            return Task.FromResult<IActionResult>(Ok("Login Ok"));
         } else
         {
-            return BadRequest("Login Fail");
+            return Task.FromResult<IActionResult>(BadRequest("Login Fail"));
         }
     }
     
