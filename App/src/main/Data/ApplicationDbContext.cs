@@ -11,12 +11,17 @@ public class ApplicationDbContext : DbContext
     
     public DbSet<Product> products { get; set; }
     public DbSet<Order> orders { get; set; }
-    public DbSet<Customer> customers { get; set; }
+    public DbSet<User> users { get; set; }
     public DbSet<OderDetails> orderDetails { get; set; }
     public DbSet<Payment> payments { get; set; }
     public DbSet<Category> categories { get; set; }
     
-    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
+    }
     
     public static void TestDatabaseConnection(ApplicationDbContext context)
     {

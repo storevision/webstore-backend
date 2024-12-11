@@ -1,12 +1,14 @@
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
+using Webshop.App.src.main.Services;
 using Webshop.Models.DB;
 using Webshop.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Lade die Umgebungsvariablen aus der .env-Datei
-Env.Load("backend.env"); 
+Env.Load("backend.env");
+
 // Konfiguriere die Datenbankverbindung
 var connectionString = $"Host={Environment.GetEnvironmentVariable("POSTGRES_HOST")};" +
                        $"Port={Environment.GetEnvironmentVariable("POSTGRES_PORT")};" + 
