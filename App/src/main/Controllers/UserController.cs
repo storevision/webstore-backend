@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Webshop.App.src.main.Models;
 using Webshop.App.src.main.Services;
 
 namespace Webshop.App.src.main.Controllers;
@@ -7,43 +8,134 @@ namespace Webshop.App.src.main.Controllers;
 [Route("users")]
 public class UserController : ControllerBase
 {
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
+    private readonly AuthService _authService;
 
-    public UserController(UserService userService)
+    public UserController(IUserService userService, AuthService authService)
     {
         _userService = userService;
+        _authService = authService;
     }
-    
-    [HttpPost]
-    [Route("Register")]
-    public Task<IActionResult> CreateUser([FromForm] string email, [FromForm] string password, [FromForm] string displayName)
-    {
-        _userService.CreateUser(email, password, displayName);
-        return Task.FromResult<IActionResult>(Ok());
-    }
-    
-    [HttpPost]
-    [Route("Login")]
-    public Task<IActionResult> Login([FromForm] string email, [FromForm] string password)
-    {
-        bool loginOk = _userService.Login(email, password);
 
-        if (loginOk)
+    [HttpPost]
+    [Route("register")]
+    public async Task<IActionResult> CreateUser([FromBody] RegisterRequestBody user)
+    {
+        var newUser = new User(user.email, user.password, user.displayName);
+        await _userService.CreateUserAsync(newUser);
+        
+        var registeredUser = await _userService.GetUserByEmailAsync(user.email);
+
+        if (registeredUser != null) generateJwtTocken(registeredUser, false);
+
+        var createdResponse = new CreatedResponse<User>
         {
-            return Task.FromResult<IActionResult>(Ok("Login Ok"));
-        } else
-        {
-            return Task.FromResult<IActionResult>(BadRequest("Login Fail"));
-        }
+            success = true
+        };
+        
+        createdResponse.createSuccessResponse(true, newUser);
+        return Ok(createdResponse);
     }
-    
+
+    [HttpPost]
+    [Route("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequestBody user)
+    {
+        
+        var existingUser = await _userService.GetUserByEmailAsync(user.email);
+
+        var createdResponse = new CreatedResponse<User>
+        {
+            success = true
+        };
+        if (existingUser == null || !existingUser.VerifyPassword(user.password))
+        {
+            createdResponse.createErrorResponse(false, "Password is incorrect.");
+            return BadRequest(createdResponse);
+        }
+
+        // Generate JWT token
+        generateJwtTocken(existingUser, user.keepLoggedIn);
+        
+        createdResponse.createSuccessResponse(true, existingUser);
+        
+        return Ok(createdResponse);
+    }
+
+    [HttpPost]
+    [Route("logout")]
+    public IActionResult Logout()
+    {
+        _authService.ClearTokenCookie(Response);
+        return Ok(new { message = "Logout successful" });
+    }
+
     [HttpGet]
     [Route("info")]
-    public async Task<IActionResult> Info()
+    public IActionResult Info()
     {
-        var response = new { message = "Login Ok" };
-        return StatusCode(201, response);
+        var token = Request.Cookies["token"];
+        var createdResponse = new CreatedResponse<User?>
+        {
+            success = true
+        };
+
+        if (string.IsNullOrEmpty(token))
+        {
+            return Unauthorized(new { message = "Token missing or invalid." });
+        }
+
+        var userClaims = _authService.ValidateToken(token);
+
+        if (userClaims == null)
+        {
+            return Unauthorized(new { message = "Token validation failed." });
+        }
+
+        int value = Convert.ToInt32(userClaims.FindFirst("id")?.Value);
+        Task<User?> user = null;
+        
+        if (value != null)
+        {
+            user = _userService.GetUserByIdAsync(value);
+            User requiredUser = user.Result;
+            createdResponse.createSuccessResponse(true ,requiredUser);
+        }
+
+        var response = new
+        {
+            success = true,
+            data = new
+            {
+                id = Convert.ToInt32(userClaims.FindFirst("id")?.Value),
+                email = userClaims.FindFirst("email")?.Value,
+                display_name = userClaims.FindFirst("display_name")?.Value
+            }
+        };
+
+        // Rückgabe als JSON
+        return Ok(response);
     }
-    
-    
+
+    private void generateJwtTocken(User existingUser, bool keepLoggedIn )
+    {
+        var token = _authService.GenerateToken(existingUser, keepLoggedIn);
+
+        // Set cookie
+        _authService.SetTokenCookie(Response, token, keepLoggedIn);
+    }
+
+    public class RegisterRequestBody
+    {
+        public string email { get; set; }
+        public string password { get; set; }
+        public string displayName { get; set; }
+    }
+
+    public class LoginRequestBody
+    {
+        public string email { get; set; }
+        public string password { get; set; }
+        public bool keepLoggedIn { get; set; }
+    }
 }

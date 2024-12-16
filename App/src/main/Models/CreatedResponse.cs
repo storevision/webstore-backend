@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Webshop.App.src.main.Models;
@@ -6,7 +7,7 @@ namespace Webshop.App.src.main.Models;
 public class CreatedResponse<T>
 {
     public required bool success { get; set; }
-    public List<T>? data { get; set; }
+    public List<T> data { get; set; }
     public T? result { get; set; }
     
     public string? error { get; set; }
@@ -33,7 +34,6 @@ public class CreatedResponse<T>
         success = status;
         error = err;
     }
-    
     
 }
 

@@ -21,15 +21,18 @@ var connectionString = $"Host={Environment.GetEnvironmentVariable("POSTGRES_HOST
 //Console.WriteLine($"ConnectionString: {connectionString}");
 
 // Add services to the container.
+builder.Services.AddLogging();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer(); // Für Endpunkte erforderlich
-builder.Services.AddSwaggerGen(); // Swagger-Dienst hinzufügen
+builder.Services.AddEndpointsApiExplorer(); // necessary for the endpoint 
+builder.Services.AddSwaggerGen(); // Add Swagger-Service
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddScoped<ProductService>();
-builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<CategorieService>();
+builder.Services.AddScoped<AuthService>();
+
 var app = builder.Build();
 
 //using (var scope = app.Services.CreateScope())
@@ -57,6 +60,9 @@ app.MapWhen(context => context.Request.Path.StartsWithSegments("/api/assets"), s
         RequestPath = "/api/assets"
     });
 });
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
 
 // app.UseHttpsRedirection();
 app.MapControllers();

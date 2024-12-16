@@ -1,36 +1,66 @@
 ﻿using Webshop.App.src.main.Models;
 using Webshop.Models.DB;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace Webshop.App.src.main.Services;
 
-public class UserService
+public class UserService : IUserService
 {
     private readonly ApplicationDbContext _context;
+    private IUserService _userServiceImplementation;
 
     public UserService(ApplicationDbContext context)
     {
         _context = context;
     }
-    
-    public void CreateUser(string email, string password, string displayName)
+
+    // Asynchrones Erstellen eines Benutzers
+    public async Task CreateUserAsync(User user)
     {
-        User user = new User(email, password, displayName);
         _context.users.Add(user);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 
-    public bool Login(string email, string password)
+    // Benutzer anhand der E-Mail abrufen
+    public async Task<User?> GetUserByEmailAsync(string email)
     {
-        List<User> customers = _context.users
-                .Where(x => x.Email == email)
-                .ToList();
-        
-        User user = customers.FirstOrDefault();
-        if (user != null && !user.VerifyPassword(password))
+        return await _context.users.FirstOrDefaultAsync(u => u.Email == email);
+    }
+
+    public async Task<User?> GetUserByIdAsync(int id)
+    {
+        return await _context.users.FirstOrDefaultAsync(u => u.CustomerID == id);
+    }
+
+    // Benutzeranmeldung validieren
+    public async Task<bool> LoginAsync(string email, string password)
+    {
+        var user = await GetUserByEmailAsync(email);
+
+        if (user == null || !user.VerifyPassword(password))
         {
-            throw(new Exception("Password verification failed"));
             return false;
         }
+
         return true;
+    }
+
+    // Verifizieren eines Benutzers basierend auf dem JWT-Token-Objekt
+    public async Task<bool> VerifyUserByObjectAsync(TokenUser tokenUser)
+    {
+        if (string.IsNullOrEmpty(tokenUser.Id) || string.IsNullOrEmpty(tokenUser.Email))
+        {
+            return false;
+        }
+
+        if (!int.TryParse(tokenUser.Id, out var userId))
+        {
+            return false;
+        }
+
+        var user = await _context.users.FirstOrDefaultAsync(u => u.CustomerID == userId && u.Email == tokenUser.Email);
+
+        return user != null;
     }
 }

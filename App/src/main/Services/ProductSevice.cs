@@ -62,4 +62,23 @@ public class ProductService
             await _context.SaveChangesAsync();
         }
     }
+
+    // TODO needs to handle the given parameters to add a review referenced to the given product
+    public async Task AddProductReviewAsync(int id, int rating, string review)
+    {
+        
+    }
+    
+    // TODO needs to handle the given parameters to edit the review referenced to the given product
+    public async Task EditProductReviewAsync(int id, int rating, string review)
+    {
+        
+    }
+    
+    // TODO needs to handle the given parameters to delete a review referenced to the given product
+    public async Task DeleteProductReviewAsync(int productId)
+    {
+        
+    }
+    
 }
