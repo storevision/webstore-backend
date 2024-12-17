@@ -27,14 +27,18 @@ public class UserController : ControllerBase
         var registeredUser = await _userService.GetUserByEmailAsync(user.email);
 
         if (registeredUser != null) generateJwtTocken(registeredUser, false);
-
-        var createdResponse = new CreatedResponse<User>
-        {
-            success = true
-        };
         
-        createdResponse.createSuccessResponse(true, newUser);
-        return Ok(createdResponse);
+        var response = new
+        {
+            success = true,
+            data = new
+            {
+                id = newUser.CustomerID,
+                email = newUser.Email,
+                display_name = newUser.DisplayName
+            }
+        };
+        return Ok(response);
     }
 
     [HttpPost]
