@@ -10,6 +10,7 @@
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="DotNetEnv" Version="3.1.1" />
     <PackageReference Include="EntityFrameworkCore.Toolbox" Version="9.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
       <PrivateAssets>all</PrivateAssets>
@@ -19,6 +20,28 @@
     <PackageReference Include="Npgsql" Version="9.0.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\assets\amazoni-tablet.png" />
+    <None Include="wwwroot\assets\amazoni_paper.jpeg" />
+    <None Include="wwwroot\assets\barbaz-hoodie.png" />
+    <None Include="wwwroot\assets\bazqux-socks.png" />
+    <None Include="wwwroot\assets\calendars-2021.png" />
+    <None Include="wwwroot\assets\corge-hat.png" />
+    <None Include="wwwroot\assets\ding-dong-doorbell.png" />
+    <None Include="wwwroot\assets\echo-comma.png" />
+    <None Include="wwwroot\assets\fire-tv-stick.png" />
+    <None Include="wwwroot\assets\floortex-mat.png" />
+    <None Include="wwwroot\assets\foobar-tshirt.png" />
+    <None Include="wwwroot\assets\kindle-paperwhite.png" />
+    <None Include="wwwroot\assets\pencils-pens-erasers.png" />
+    <None Include="wwwroot\assets\quuxcor-shoes.png" />
+    <None Include="wwwroot\assets\quxquux-pants.png" />
+    <None Include="wwwroot\assets\surefire-aa-batteries.jpeg" />
+    <None Include="wwwroot\assets\undraw_undraw_undraw_undraw_undraw_flying_drone_u3r2_-3-_egfy_-1-_2xjb_-1-_2hl5_(2)_ejqu.png" />
+    <None Include="wwwroot\assets\water-tv-stick.png" />
   </ItemGroup>
 
 </Project>

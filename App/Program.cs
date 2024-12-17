@@ -1,8 +1,13 @@
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Webshop.App.src.main.Services;
+using Microsoft.Extensions.FileProviders;
 using Webshop.Models.DB;
 using Webshop.Services;
+using System;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,39 +21,64 @@ var connectionString = $"Host={Environment.GetEnvironmentVariable("POSTGRES_HOST
                        $"Username={Environment.GetEnvironmentVariable("POSTGRES_USER")};" + 
                        $"Password={Environment.GetEnvironmentVariable("POSTGRES_PASSWORD")}";
 
-//Console.WriteLine($"ConnectionString: {connectionString}");
-
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddLogging();
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer(); // Für Endpunkte erforderlich
-builder.Services.AddSwaggerGen(); // Swagger-Dienst hinzufügen
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddScoped<ProductService>();
-builder.Services.AddScoped<UserService>();
-var app = builder.Build();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<CategorieService>();
+builder.Services.AddScoped<AuthService>();
 
-//using (var scope = app.Services.CreateScope())
-//{
-//    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(); 
-//    ApplicationDbContext.TestDatabaseConnection(context);
-//}
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.UseSwagger(); // Swagger JSON-Dokument
-    app.UseSwaggerUI(); // Swagger UI
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-// app.UseHttpsRedirection();
-app.MapControllers();
-//Der Methodenaufruf von ApplicationDbContext für eine sql abfrage
+app.UseStaticFiles();
+app.MapWhen(context => context.Request.Path.StartsWithSegments("/api/assets"), subApp =>
+{
+    subApp.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(
+            Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/assets")),
+        RequestPath = "/api/assets"
+    });
+});
 
+app.UseHttpsRedirection();
+app.UseAuthorization();
+
+app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    
+    // make sure db exist
+    context.Database.EnsureCreated();
+    
+    // read sql and execute it
+    var sqlFilePath = "sql/test.sql"; // Pfad zur SQL-Datei
+    if (File.Exists(sqlFilePath))
+    {
+        var sqlQuery = File.ReadAllText(sqlFilePath); // Inhalt der SQL-Datei einlesen
+        var rowsModified = context.Database.ExecuteSqlRaw(sqlQuery); // SQL ausführen
+        Console.WriteLine($"{rowsModified} rows were modified by the SQL script.");
+    }
+    else
+    {
+        Console.WriteLine($"Die SQL-Datei '{sqlFilePath}' wurde nicht gefunden.");
+    }
+}
 
 Console.WriteLine("Die Anwendung wurde gestartet.");
 app.Run();
-
-

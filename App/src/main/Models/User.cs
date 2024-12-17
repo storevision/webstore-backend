@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Webshop.Models.Cart;
 
 namespace Webshop.App.src.main.Models
@@ -19,19 +20,20 @@ namespace Webshop.App.src.main.Models
         [Required]
         [Column ("display_name")]
         public string  DisplayName { get; set; }
-
-        [Required]
-        [Column("password_hash")]
+        
         // Passwort wird als Hash gespeichert
         private string PasswordHash = string.Empty;
 
         [Required]
         [Column("password_changed_at")]
-        public DateTime  PasswordChangedAt { get; set; } = DateTime.Now;
+        public DateTime PasswordChangedAt { get; set; } = DateTime.UtcNow;
         
         public ICollection<Order>? Orders { get; set; } = null!;
 
         // Passwort-Property: nur zum Setzen
+        [Required]
+        [JsonIgnore]
+        [Column("password_hash")]
         public string Password
         {
             set

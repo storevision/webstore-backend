@@ -16,6 +16,6 @@ public class Inventory
     [Column("quantity")]
     public int Quantity { get; set; }
     
-    [ForeignKey("ProductId")]
+    [ForeignKey("product_id")]
     public Product Product { get; set; }
 }
