@@ -134,7 +134,7 @@ public class UserController : ControllerBase
         var token = _authService.GenerateToken(existingUser, keepLoggedIn);
 
         // Set cookie
-        _authService.SetTokenCookie(Response, token, keepLoggedIn);
+        _authService.SetTokenCookie(Request, Response, token, keepLoggedIn);
     }
 
     public class RegisterRequestBody

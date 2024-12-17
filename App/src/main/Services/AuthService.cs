@@ -61,12 +61,12 @@ public class AuthService
         }
     }
 
-    public void SetTokenCookie(HttpResponse response, string token, bool keepLoggedIn)
+    public void SetTokenCookie(HttpRequest request, HttpResponse response, string token, bool keepLoggedIn)
     {
         response.Cookies.Append("token", token, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true, // Requires HTTPS
+            Secure = request.IsHttps,
             SameSite = SameSiteMode.Strict,
             Expires = keepLoggedIn ? DateTimeOffset.UtcNow.AddDays(30) : null
         });
