@@ -56,10 +56,18 @@ public class UserController : ControllerBase
 
         // Generate JWT token
         generateJwtTocken(existingUser, user.keepLoggedIn);
+        var response = new
+        {
+            success = true,
+            data = new
+            {
+                id = existingUser.CustomerID,
+                email = existingUser.Email,
+                display_name = existingUser.DisplayName
+            }
+        };
         
-        createdResponse.createSuccessResponse(true, existingUser);
-        
-        return Ok(createdResponse);
+        return Ok(response);
     }
 
     [HttpPost]
@@ -67,7 +75,7 @@ public class UserController : ControllerBase
     public IActionResult Logout()
     {
         _authService.ClearTokenCookie(Response);
-        return Ok(new { message = "Logout successful" });
+        return Ok(new { success = true });
     }
 
     [HttpGet]
