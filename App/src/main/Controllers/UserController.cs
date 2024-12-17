@@ -54,7 +54,7 @@ public class UserController : ControllerBase
         };
         if (existingUser == null || !existingUser.VerifyPassword(user.password))
         {
-            createdResponse.createErrorResponse(false, "Password is incorrect.");
+            createdResponse.createErrorResponse(false, "Invalid email or password.");
             return BadRequest(createdResponse);
         }
 
