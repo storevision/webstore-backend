@@ -16,6 +16,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Payment> payments { get; set; }
     public DbSet<Category> categories { get; set; }
     public DbSet<Inventory> inventory { get; set; }
+    public DbSet<Address> adresses { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
