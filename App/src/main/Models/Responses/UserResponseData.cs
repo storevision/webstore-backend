@@ -1,4 +1,6 @@
-﻿namespace Webshop.App.src.main.Models.Responses;
+﻿
+
+namespace Webshop.App.src.main.Models.Responses;
 
 public class UserResponseData
 {
@@ -6,13 +8,13 @@ public class UserResponseData
     
     public string email { get; set; }
     
-    public string displayName { get; set; }
+    public string display_name { get; set; }
     
     
     public UserResponseData(User user)
     {
         id = user.CustomerID;
         email = user.Email;
-        displayName = user.DisplayName;
+        display_name = user.DisplayName;
     }
 }
