@@ -10,30 +10,30 @@ public class Address
     [Required]
     [Column("addressid")]
     [JsonPropertyName("addressid")]
-    public int addressid;
+    public int Addressid { get; set; }
     
     [Required]
     [Column("state")]
     [JsonPropertyName("state")]
-    public string state;
+    public string State { get; set; }
     
     [Column("country")]
     [JsonPropertyName("country")]
-    public string country = "";
+    public string Country { get; set; }
     
     [Column("region")]
     [JsonPropertyName("region")]
-    public string region = "";
+    public string Region { get; set; }
     
     [Required]
     [Column("zipcode")]
     [JsonPropertyName("zipcode")]
-    public string zipcode;
+    public string ZipCode { get; set; }
     
     [Column("phone")]
     [JsonPropertyName("phone")]
-    public string phone = "";
+    public string Phone { get; set; }
     
     [ForeignKey("CustomerId")]
-    private int userid;
+    private int UserId { get; set; }
 }
