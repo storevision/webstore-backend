@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
-using Webshop.App.src.main.Models;
+using Webshop.App.src.main.Models.ApiHelper;
+using Webshop.App.src.main.Models.Responses;
 using Webshop.Services;
 using Webshop.Models.Products;
 
@@ -8,65 +9,34 @@ namespace Webshop.Controllers;
 
 [ApiController]
 [Route("products")]
-public class ProductController : ControllerBase
+public class ProductController : ApiHelper
 {
-    /**
-     * Hier wird eine Variable erzeugt in welcher der ProductService injekted wird
-     */
+  
+    // Inject the ProductService
     private readonly ProductService _productService;
 
+    // When the ProductController is created, the ProductService is injected
     public ProductController(ProductService productService)
     {
         _productService = productService;
     }
-
     
-    // Response a list of all existing products
-    /** Product has to be modified 
-     *
-    {
-  "success": true,
-  "data": [
-    {
-      "id": 0,
-      "name": "string",
-      "price_per_unit": 0,
-      "description": "string",
-      "category_id": 0,
-      "image_url": "string",
-      "image_width": 0,
-      "image_height": 0,
-      "blurred_image": "string",
-      "blurred_image_width": 0,
-      "blurred_image_height": 0,
-      "stock": 0,
-      "avg_rating": 0
-    }
-  ]
-} *
-     */
-    [HttpGet]
-    [Route("list")]
+    // Get all products
+    [HttpGet("list")]
     public async Task<IActionResult> GetProducts()
     {
-        CreatedResponse<Product> createdResponse = new CreatedResponse<Product>
-        {
-            success = false
-        };
-        
         try
         {
-            List<Product> products = await _productService.GetAllProductsAsync();
+            var products = await _productService.GetAllProductsAsync();
+
+            var successResponse = new SuccessResponse<List<Product>>(products);
             
-            createdResponse.createSuccessListResponse(true, products);
-            return Ok(createdResponse);
-            
+            return this.SendSuccess(products);
+
         }
         catch (Exception e)
         {
-            createdResponse.createErrorResponse(false, e.Message);
-            return BadRequest(createdResponse);
-
+            return this.SendError(HttpStatusCode.InternalServerError, "An error occurred while fetching the products.");
         }
     }
 
@@ -79,7 +49,8 @@ public class ProductController : ControllerBase
         {
             return NotFound();
         }
-        return Ok(product);
+
+        return this.SendSuccess(product);
     }
 
     // Unused
@@ -95,6 +66,7 @@ public class ProductController : ControllerBase
     public async Task<IActionResult> DeleteProduct(int id)
     {
         await _productService.DeleteProductAsync(id);
+        
         return NoContent();
     }
 

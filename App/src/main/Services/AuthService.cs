@@ -4,18 +4,23 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Webshop.App.src.main.Models;
 using Webshop.App.src.main.Services;
+using Webshop.App.src.main.Services.Interfaces;
 
-public class AuthService
+// AuthService is a service class that handles authentication
+public class AuthService : IAuthService
 {
+    // injects the configuration and user service
     private readonly string _jwtSecret;
     private readonly IUserService _userService;
 
+    // when the AuthService is created, the configuration and user service are injected
     public AuthService(IConfiguration configuration, IUserService userService)
     {
         _jwtSecret = configuration["JWT_SECRET"] ?? throw new Exception("JWT_SECRET is not defined");
         _userService = userService;
     }
-
+    
+    // GenerateToken method is used to generate a JWT token
     public string GenerateToken(User user, bool keepLoggedIn)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -37,6 +42,7 @@ public class AuthService
         return tokenHandler.WriteToken(token);
     }
 
+    // ValidateToken method is used to validate a JWT token
     public ClaimsPrincipal? ValidateToken(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -111,6 +117,15 @@ public class AuthService
 
         return user;
     }
+
+    public void GenerateJwtTocken(HttpRequest request, HttpResponse response, User existingUser, bool keepLoggedIn )
+    {
+        var token = this.GenerateToken(existingUser, keepLoggedIn);
+
+        // Set cookie
+        this.SetTokenCookie(request, response, token, keepLoggedIn);
+    }
+    
 }
 
 public class TokenUser
