@@ -1,107 +1,96 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using Webshop.App.src.main.Models;
+using Webshop.App.src.main.Models.ApiHelper;
+using Webshop.App.src.main.Models.Responses;
 using Webshop.App.src.main.Services;
+using Webshop.App.src.main.Services.Interfaces;
 
 namespace Webshop.App.src.main.Controllers;
 
+// UserController class is a controller class for user related operations
 [ApiController]
 [Route("users")]
-public class UserController : ControllerBase
+public class UserController : ApiHelper
 {
+    // here we inject the IUserService and IAuthService interfaces
     private readonly IUserService _userService;
-    private readonly AuthService _authService;
+    private readonly IAuthService _authService;
 
+    //when the UserController is created, the IUserService and IAuthService are injected
     public UserController(IUserService userService, AuthService authService)
     {
         _userService = userService;
         _authService = authService;
     }
 
-    [HttpPost]
-    [Route("register")]
+    // CreateUser method is used to create a new user
+    [HttpPost("register")]
     public async Task<IActionResult> CreateUser([FromBody] RegisterRequestBody user)
     {
-        var newUser = new User(user.email, user.password, user.displayName);
-        await _userService.CreateUserAsync(newUser);
-        
+        await _userService.CreateUserAsync(new User(user.email, user.password, user.displayName));
+
         var registeredUser = await _userService.GetUserByEmailAsync(user.email);
 
-        if (registeredUser != null) generateJwtTocken(registeredUser, false);
-        
-        var response = new
+        if (registeredUser != null)
         {
-            success = true,
-            data = new
-            {
-                id = newUser.CustomerID,
-                email = newUser.Email,
-                display_name = newUser.DisplayName
-            }
-        };
-        return Ok(response);
+            _authService.GenerateJwtTocken(Request, Response, registeredUser, false);
+        }
+        else
+        {
+            return this.SendError(HttpStatusCode.InternalServerError, "User could not be created.");
+        }
+
+        return this.SendSuccess(new UserResponseData(registeredUser));
     }
 
-    [HttpPost]
-    [Route("login")]
+    // Login method is used to login a user
+    [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequestBody user)
     {
         
         var existingUser = await _userService.GetUserByEmailAsync(user.email);
-
-        var createdResponse = new CreatedResponse<User>
-        {
-            success = true
-        };
+        
         if (existingUser == null || !existingUser.VerifyPassword(user.password))
         {
-            createdResponse.createErrorResponse(false, "Invalid email or password.");
-            return BadRequest(createdResponse);
+            return this.SendError(HttpStatusCode.Unauthorized, "Invalid email or password.");
         }
-
         // Generate JWT token
-        generateJwtTocken(existingUser, user.keepLoggedIn);
-        var response = new
-        {
-            success = true,
-            data = new
-            {
-                id = existingUser.CustomerID,
-                email = existingUser.Email,
-                display_name = existingUser.DisplayName
-            }
-        };
+        _authService.GenerateJwtTocken(Request, Response, existingUser, user.keepLoggedIn);
         
-        return Ok(response);
+        return this.SendSuccess(new UserResponseData(existingUser));
     }
-
-    [HttpPost]
-    [Route("logout")]
+    
+    // Logout method is used to logout a user
+    [HttpPost("logout")]
     public IActionResult Logout()
     {
-        _authService.ClearTokenCookie(Response);
-        return Ok(new { success = true });
+        try {
+            _authService.ClearTokenCookie(Response);
+            return Ok(new {success = true});
+        } catch {
+            return this.SendError(HttpStatusCode.InternalServerError, "Logout failed.");
+        }
+        
     }
-
-    [HttpGet]
-    [Route("info")]
+    
+    // Info method is used to get user information
+    [HttpGet("info")]
     public IActionResult Info()
     {
+        User requiredUser = null;
         var token = Request.Cookies["token"];
-        var createdResponse = new CreatedResponse<User?>
-        {
-            success = true
-        };
 
         if (string.IsNullOrEmpty(token))
         {
-            return Unauthorized(new { message = "Token missing or invalid." });
+            return this.SendError(HttpStatusCode.Unauthorized, "Token missing or invalid.");
         }
 
         var userClaims = _authService.ValidateToken(token);
 
         if (userClaims == null)
         {
-            return Unauthorized(new { message = "Token validation failed." });
+            return this.SendError(HttpStatusCode.Unauthorized, "Token validation failed.");
         }
 
         int value = Convert.ToInt32(userClaims.FindFirst("id")?.Value);
@@ -110,33 +99,15 @@ public class UserController : ControllerBase
         if (value != null)
         {
             user = _userService.GetUserByIdAsync(value);
-            User requiredUser = user.Result;
-            createdResponse.createSuccessResponse(true ,requiredUser);
-        }
-
-        var response = new
+            requiredUser = user.Result;
+        }else
         {
-            success = true,
-            data = new
-            {
-                id = Convert.ToInt32(userClaims.FindFirst("id")?.Value),
-                email = userClaims.FindFirst("email")?.Value,
-                display_name = userClaims.FindFirst("display_name")?.Value
-            }
-        };
-
-        // Rückgabe als JSON
-        return Ok(response);
+            return this.SendError(HttpStatusCode.Unauthorized, "Token validation failed.");
+        }
+        // return user information as response
+        return this.SendSuccess(new UserResponseData(requiredUser));
     }
-
-    private void generateJwtTocken(User existingUser, bool keepLoggedIn )
-    {
-        var token = _authService.GenerateToken(existingUser, keepLoggedIn);
-
-        // Set cookie
-        _authService.SetTokenCookie(Request, Response, token, keepLoggedIn);
-    }
-
+    
     public class RegisterRequestBody
     {
         public string email { get; set; }

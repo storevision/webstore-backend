@@ -18,6 +18,7 @@ namespace Webshop.App.src.main.Models
         public string? Email { get; set; }
         
         [Required]
+        [JsonPropertyName("display_name")]
         [Column ("display_name")]
         public string  DisplayName { get; set; }
         

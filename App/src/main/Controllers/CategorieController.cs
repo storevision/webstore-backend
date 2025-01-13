@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Webshop.App.src.main.Models;
+using Webshop.App.src.main.Models.ApiHelper;
 using Webshop.Services;
 
 namespace Webshop.Controllers;
 
+// CategorieController is a controller class that handles requests for categories
 [ApiController]
 [Route("categories")]
-public class CategorieController : ControllerBase
+public class CategorieController : ApiHelper
 {
     
     private readonly CategorieService _categorieService;
@@ -16,16 +18,12 @@ public class CategorieController : ControllerBase
         _categorieService = categorieService;
     }
     
+    // Get all categories
     [HttpGet]
     [Route("list")]
     public async Task<IActionResult> GetCategories()
     {
         List<Category> categories = await _categorieService.GetAllCategoriesAsync();
-        CreatedResponse<Category> categoriesResponse = new CreatedResponse<Category>()
-        {
-            success = false
-        };
-        categoriesResponse.createSuccessListResponse(true, categories);
-        return Ok(categoriesResponse);
+        return this.SendSuccess(categories);
     }
 }
