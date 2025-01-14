@@ -51,4 +51,43 @@ public class Product
     [JsonIgnore]
     public Category Category { get; set; }
     
+    [JsonPropertyName("image_with")]
+    [Column("image_with")]
+    public string? ImageWith { get; set; }
+    
+    [JsonPropertyName("image_height")]
+    [Column("image_height")]
+    public string? ImageHeight { get; set; }
+    
+    [JsonPropertyName("stock")]
+    [Column("stock")]
+    public int Stock { get; set; }
+    
+    [JsonPropertyName("one_star")]
+    [Column("one_star")]
+    public int OneStar { get; set; }
+    
+    [JsonPropertyName("two_star")]
+    [Column("two_star")]
+    public int TwoStar { get; set; }
+    
+    [JsonPropertyName("three_star")]
+    [Column("three_star")]
+    public int ThreeStar { get; set; }
+    
+    [JsonPropertyName("four_star")]
+    [Column("four_star")]
+    public int FourStar { get; set; }
+    
+    [JsonPropertyName("five_star")]
+    [Column("five_star")]
+    public int FiveStar { get; set; }
+    
+    [JsonPropertyName("total_reviews")]
+    [Column("total_reviews")]
+    public int TotalReviews { get; set; }
+    
+    [JsonPropertyName("average_rating")]
+    [Column("average_rating")]
+    public int AverageRating { get; set; }
 }
