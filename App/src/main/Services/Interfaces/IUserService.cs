@@ -11,4 +11,5 @@ public interface IUserService
     public Task<User?> GetUserByEmailAsync(string email);
 
     Task<User?>? GetUserByIdAsync(int value);
+    Address[] getUserAdresses(int userId);
 }

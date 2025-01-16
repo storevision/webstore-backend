@@ -9,8 +9,17 @@ public class Address
     [Key]
     [Required]
     [Column("addressid")]
-    [JsonPropertyName("addressid")]
+    [JsonIgnore]
     public int Addressid { get; set; }
+    
+    
+    [Column("address")]
+    [JsonPropertyName("address")]
+    public string Street { get; set; }
+    
+    [Column("name")]
+    [JsonPropertyName("name")]
+    public string Name { get; set; }
     
     [Required]
     [Column("state")]
@@ -21,19 +30,16 @@ public class Address
     [JsonPropertyName("country")]
     public string Country { get; set; }
     
-    [Column("region")]
-    [JsonPropertyName("region")]
-    public string Region { get; set; }
+    [Column("city")]
+    [JsonPropertyName("city")]
+    public string City { get; set; }
     
     [Required]
-    [Column("zipcode")]
-    [JsonPropertyName("zipcode")]
-    public string ZipCode { get; set; }
+    [Column("postal_code")]
+    [JsonPropertyName("postal_code")]
+    public string PostalCode { get; set; }
     
-    [Column("phone")]
-    [JsonPropertyName("phone")]
-    public string Phone { get; set; }
-    
-    [ForeignKey("CustomerId")]
-    private int UserId { get; set; }
+    [ForeignKey("user_id")]
+    [JsonIgnore]
+    public User User { get; set; }
 }

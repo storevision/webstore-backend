@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Webshop.Models.Cart;
-using Webshop.Models.Products;
 
 namespace Webshop.App.src.main.Models;
 

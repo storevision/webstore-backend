@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Webshop.App.src.main.Models.ApiHelper;
 using Webshop.App.src.main.Models.Responses;
+using Webshop.App.src.main.Models;
 using Webshop.Services;
-using Webshop.Models.Products;
 
 namespace Webshop.Controllers;
 
@@ -77,10 +77,10 @@ public class ProductController : ApiHelper
      */
 
     [HttpPost]
-    [Route("review/add")]
-    public async Task<IActionResult> AddReview([FromBody] ReviewRequestBody review)
+    [Route("productReview/add")]
+    public async Task<IActionResult> AddReview([FromBody] ProductReviewRequestBody productReview)
     {
-        _productService.AddProductReviewAsync(review.product_id, review.rating, review.comment);
+        _productService.AddProductReviewAsync(productReview.product_id, productReview.rating, productReview.comment);
         return Ok();
     }
     
@@ -90,10 +90,10 @@ public class ProductController : ApiHelper
      */
     
     [HttpPost]
-    [Route("review/edit")]
-    public async Task<IActionResult> EditReview([FromBody] ReviewRequestBody review)
+    [Route("productReview/edit")]
+    public async Task<IActionResult> EditReview([FromBody] ProductReviewRequestBody productReview)
     {
-        _productService.EditProductReviewAsync(review.product_id, review.rating, review.comment);
+        _productService.EditProductReviewAsync(productReview.product_id, productReview.rating, productReview.comment);
         return Ok();
     }
     
@@ -110,7 +110,7 @@ public class ProductController : ApiHelper
         return Ok();
     }
     
-    public class ReviewRequestBody
+    public class ProductReviewRequestBody
     {
         public int product_id { get; set; }
         public int rating { get; set; }

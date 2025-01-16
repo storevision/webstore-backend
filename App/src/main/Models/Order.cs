@@ -1,16 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Webshop.App.src.main.Models;
-using Webshop.Models.Products;
 
-namespace Webshop.Models.Cart;
+namespace Webshop.App.src.main.Models;
 
 [Table("orders")]
 public class Order
 {
     [Key]
+    [Column("order_id")]
     public int OrderId { get; set; }
+    
+    [Column("total_amount")]
     public decimal? TotalAmount { get; set; }
+    
+    [Column("order_date")]
     public DateTime OrderDate { get; set; }
     [ForeignKey("CustomerId")]
     public int CustomerId { get; set; }

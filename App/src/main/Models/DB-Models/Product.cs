@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Webshop.App.src.main.Models;
 
-namespace Webshop.Models.Products;
+namespace Webshop.App.src.main.Models;
 
 [Table("products")]
 public class Product
@@ -61,33 +61,33 @@ public class Product
     
     [JsonPropertyName("stock")]
     [Column("stock")]
-    public int Stock { get; set; }
+    public int? Stock { get; set; }
     
     [JsonPropertyName("one_star")]
     [Column("one_star")]
-    public int OneStar { get; set; }
+    public int? OneStar { get; set; }
     
     [JsonPropertyName("two_star")]
     [Column("two_star")]
-    public int TwoStar { get; set; }
+    public int? TwoStar { get; set; }
     
     [JsonPropertyName("three_star")]
     [Column("three_star")]
-    public int ThreeStar { get; set; }
+    public int? ThreeStar { get; set; }
     
     [JsonPropertyName("four_star")]
     [Column("four_star")]
-    public int FourStar { get; set; }
+    public int? FourStar { get; set; }
     
     [JsonPropertyName("five_star")]
     [Column("five_star")]
-    public int FiveStar { get; set; }
+    public int? FiveStar { get; set; }
     
     [JsonPropertyName("total_reviews")]
     [Column("total_reviews")]
-    public int TotalReviews { get; set; }
+    public int? TotalReviews { get; set; }
     
     [JsonPropertyName("average_rating")]
     [Column("average_rating")]
-    public int AverageRating { get; set; }
+    public int? AverageRating { get; set; }
 }

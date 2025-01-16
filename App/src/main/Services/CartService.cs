@@ -1,20 +1,28 @@
-﻿using System.Security.Cryptography;
-using Webshop.Models.Cart;
-using Webshop.Models.Products;
+﻿using Microsoft.EntityFrameworkCore;
+using Webshop.Models.DB;
+using Webshop.App.src.main.Models;
+using Webshop.App.src.main.Models.Responses;
 
 
 namespace Webshop.Services;
 
 public class CartService
 {
-    //Add an Article to the card
-    public static void addArticleToCart(int quantity, String productId)
-    
+    private readonly ApplicationDbContext _context;
+
+    public CartService(ApplicationDbContext context)
     {
-        Product product = new Product(); // TODO waiting for the CRUD management from @David
+        _context = context;
+    }
+    
+    //Add an Article to the card
+    public async Task addArticleToCart(int userId, int product_id, int quantity)
+    {
         
-        Order order = new Order();
-        order.AddArticleToList(product, quantity);
+        Cart cart = new Cart(userId, product_id, quantity);
+
+        _context.carts.Add(cart);
+        await _context.SaveChangesAsync();
 
     }
 
@@ -37,5 +45,65 @@ public class CartService
             
         }
         order.setTotalAmount(amount);
+    }
+    
+    public async Task<Cart[]> getCart(int id)
+    { 
+        Cart[] carts = await _context.carts.FromSqlRaw("SELECT * FROM carts WHERE user_id = {0}", id).ToArrayAsync();
+        return carts;
+        
+    }
+
+
+    public CartResponseWithProducts[] getCartItems(Cart[] cart)
+    {
+        CartResponseWithProducts[] cartItems = new CartResponseWithProducts[cart.Length];
+        for (int i = 0; i < cart.Length; i++)
+        {
+            cartItems[i] = new CartResponseWithProducts();
+            cartItems[i].ProductId = cart[i].ProductId;
+            cartItems[i].Quantity = cart[i].Quantity;
+            cartItems[i].Product = getProduct(cart[i].ProductId.ToString());
+        }
+
+        return cartItems;
+    }
+
+    public void removeArticleFromCart(int userId, int productId, int quantity)
+    {
+        if (quantity > 0)
+        {
+            _context.Database.ExecuteSqlRaw("UPDATE carts SET quantity = quantity - {0} WHERE user_id = {1} AND product_id = {2}", quantity, userId, productId);
+        }
+        else
+        {
+            _context.Database.ExecuteSqlRaw("DELETE FROM carts WHERE user_id = {0} AND product_id = {1}", userId, productId);
+        }
+        
+    }
+
+    public CartResponseWithProducts[] getCartForUserWithProducts(int userId)
+    {
+        CartResponseWithProducts[] cartItems;
+        
+        Console.WriteLine(userId);
+        var cart = this.getCart(userId);
+
+        cartItems = this.getCartItems(cart.Result);
+        return cartItems;
+    }
+
+    public CartResponse[] getCartForUser(int userId)
+    {
+        List<CartResponse> cartItems = new List<CartResponse>();
+        var carts = this.getCart(userId);
+        foreach (var cart in carts.Result)
+        {
+            CartResponse cartResponse = new CartResponse();
+            cartResponse.ProductId = cart.ProductId;
+            cartResponse.Quantity = cart.Quantity;
+            cartItems.Add(cartResponse);
+        }
+        return cartItems.ToArray();
     }
 }

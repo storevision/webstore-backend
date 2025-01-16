@@ -13,8 +13,16 @@ public class UserResponseData
     
     public UserResponseData(User user)
     {
-        id = user.CustomerID;
-        email = user.Email;
-        display_name = user.DisplayName;
+        try
+        {
+            id = user.CustomerID;
+            email = user.Email;
+            display_name = user.DisplayName;
+        }
+        catch (Exception e)
+        {
+            throw new Exception("No logged in user: " + e.Message);
+        }
+        
     }
 }
