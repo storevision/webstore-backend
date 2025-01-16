@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Webshop.App.src.main.Models;
 [Table("addresses")]
@@ -8,10 +9,9 @@ public class Address
 {
     [Key]
     [Required]
-    [Column("addressid")]
+    [Column("address_id")]
     [JsonIgnore]
     public int Addressid { get; set; }
-    
     
     [Column("address")]
     [JsonPropertyName("address")]
@@ -39,7 +39,10 @@ public class Address
     [JsonPropertyName("postal_code")]
     public string PostalCode { get; set; }
     
-    [ForeignKey("user_id")]
-    [JsonIgnore]
+    
+    [ForeignKey("user_id")] 
+    [Column("user_id")]
+    public int UserId { get; set; } 
+    [JsonIgnore] 
     public User User { get; set; }
 }
