@@ -26,9 +26,14 @@ public class CartService
 
     }
 
-    public static Product getProduct(String productId)
+    public Product getProduct(int productId)
     {
         Product product = new Product();
+        var dbProduct = _context.products.FromSqlRaw("SELECT * FROM products WHERE id = {0}", productId);
+        foreach (var p in dbProduct)
+        {
+            product = p;
+        }
         return product;
     }
 
@@ -51,7 +56,6 @@ public class CartService
     { 
         Cart[] carts = await _context.carts.FromSqlRaw("SELECT * FROM carts WHERE user_id = {0}", id).ToArrayAsync();
         return carts;
-        
     }
 
 
@@ -63,7 +67,7 @@ public class CartService
             cartItems[i] = new CartResponseWithProducts();
             cartItems[i].ProductId = cart[i].ProductId;
             cartItems[i].Quantity = cart[i].Quantity;
-            cartItems[i].Product = getProduct(cart[i].ProductId.ToString());
+            cartItems[i].Product = getProduct(cart[i].ProductId);
         }
 
         return cartItems;
@@ -93,11 +97,11 @@ public class CartService
         return cartItems;
     }
 
-    public CartResponse[] getCartForUser(int userId)
+    public async Task<CartResponse[]> getCartForUser(int userId)
     {
         List<CartResponse> cartItems = new List<CartResponse>();
-        var carts = this.getCart(userId);
-        foreach (var cart in carts.Result)
+        var carts = await this.getCart(userId);
+        foreach (var cart in carts)
         {
             CartResponse cartResponse = new CartResponse();
             cartResponse.ProductId = cart.ProductId;

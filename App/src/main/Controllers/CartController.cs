@@ -29,7 +29,7 @@ namespace Webshop.App.src.main.Controllers
         {
             var userId = getUserId();
             _cartService.addArticleToCart(userId, reviewRequestBody.product_id, reviewRequestBody.quantity);
-            CartResponse[] cartResponses = _cartService.getCartForUser(userId);
+            Task<CartResponse[]> cartResponses = _cartService.getCartForUser(userId);
             return this.SendSuccess(cartResponses);
         }
 
@@ -38,7 +38,7 @@ namespace Webshop.App.src.main.Controllers
         {
             var userId = getUserId();
             _cartService.removeArticleFromCart(userId, reviewRequestBody.product_id, reviewRequestBody.quantity);
-            CartResponse[] cartResponses = _cartService.getCartForUser(userId);
+            Task<CartResponse[]> cartResponses = _cartService.getCartForUser(userId);
             return this.SendSuccess(cartResponses);
         }
 
