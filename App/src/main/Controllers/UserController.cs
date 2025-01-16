@@ -122,6 +122,18 @@ public class UserController : ApiHelper
         return this.SendSuccess(response);
     }
     
+    [HttpPost("settings")]
+    public IActionResult Settings([FromBody] Address address)
+    {
+        var userId = getUserId();
+        if (userId == -1)
+        {
+            return this.SendError(HttpStatusCode.Unauthorized, "Token missing or invalid.");
+        }
+        _userService.addUserAddress(userId, address);
+        return this.SendSuccess(new {success = true});
+    }
+    
     private int getUserId()
     {
         var token = Request.Cookies["token"];

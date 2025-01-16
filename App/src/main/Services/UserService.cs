@@ -74,4 +74,11 @@ public class UserService : IUserService
         
         return addressList.ToArray();
     }
+    
+    public void addUserAddress(int userId, Address address)
+    {
+        address.UserId = userId;
+        _context.addresses.Add(address);
+        _context.SaveChanges();
+    }
 }

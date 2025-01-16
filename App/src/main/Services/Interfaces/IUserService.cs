@@ -12,4 +12,5 @@ public interface IUserService
 
     Task<User?>? GetUserByIdAsync(int value);
     Address[] getUserAdresses(int userId);
+    void addUserAddress(int userId, Address address);
 }
