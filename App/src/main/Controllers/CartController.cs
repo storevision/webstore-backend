@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Webshop.App.src.main.Models;
 using Webshop.App.src.main.Models.ApiHelper;
 using Webshop.App.src.main.Models.Responses;
 using Webshop.App.src.main.Services;
@@ -54,10 +55,10 @@ namespace Webshop.App.src.main.Controllers
         }
 
         [HttpPost("checkout")]
-        public IActionResult CheckoutCart()
+        public IActionResult CheckoutCart([FromBody] Address address)
         {
-            // Logik wird später hinzugefügt
-            return Ok("Checkout cart endpoint hit.");
+            bool success = true;
+            return Ok(success);
         }
 
         [HttpPost("clear")]
