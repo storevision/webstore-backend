@@ -9,7 +9,8 @@ public class ApplicationDbContext : DbContext
     
     public DbSet<Product> products { get; set; }
     public DbSet<User> users { get; set; }
-    public DbSet<OderDetails> orderDetails { get; set; }
+    public DbSet<Order> orders { get; set; }
+    public DbSet<OrderDetails> orderDetails { get; set; }
     public DbSet<Payment> payments { get; set; }
     public DbSet<Category> categories { get; set; }
     public DbSet<Inventory> inventory { get; set; }
@@ -31,6 +32,10 @@ public class ApplicationDbContext : DbContext
         
         modelBuilder.Entity<Cart>()
             .HasKey(e => new { e.UserId, e.ProductId });
+        
+        modelBuilder.Entity<OrderDetails>()
+            .HasKey(o=> new {o.OrderId, o.ProductId});
+        
     }
     
     public static void TestDatabaseConnection(ApplicationDbContext context)

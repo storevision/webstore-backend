@@ -29,7 +29,7 @@ public class UserService : IUserService
 
     public async Task<User?> GetUserByIdAsync(int id)
     {
-        return await _context.users.FirstOrDefaultAsync(u => u.CustomerID == id);
+        return await _context.users.FirstOrDefaultAsync(u => u.CustomerId == id);
     }
 
     // Benutzeranmeldung validieren
@@ -58,7 +58,7 @@ public class UserService : IUserService
             return false;
         }
 
-        var user = await _context.users.FirstOrDefaultAsync(u => u.CustomerID == userId && u.Email == tokenUser.Email);
+        var user = await _context.users.FirstOrDefaultAsync(u => u.CustomerId == userId && u.Email == tokenUser.Email);
 
         return user != null;
     }
@@ -77,7 +77,7 @@ public class UserService : IUserService
     
     public void addUserAddress(int userId, Address address)
     {
-        address.UserId = userId;
+        address.CustomerId = userId;
         _context.addresses.Add(address);
         _context.SaveChanges();
     }

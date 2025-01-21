@@ -27,12 +27,15 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString),
+ServiceLifetime.Scoped // Standardmäßig scoped
+    );
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<CategorieService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<OrderService>();
 
 var app = builder.Build();
 

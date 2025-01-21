@@ -39,8 +39,12 @@ public class Address
     [JsonPropertyName("postal_code")]
     public string PostalCode { get; set; }
     
-    [ForeignKey("user_id")] 
     [Column("user_id")]
     [JsonIgnore]
-    public int? UserId { get; set; } 
+    public int CustomerId { get; set; } 
+    // FK-Eigenschaft
+    
+    [ForeignKey("CustomerId")] 
+    [JsonIgnore]
+    private User? User { get; set; }
 }

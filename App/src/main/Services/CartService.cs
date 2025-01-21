@@ -9,21 +9,29 @@ namespace Webshop.Services;
 public class CartService
 {
     private readonly ApplicationDbContext _context;
+    private readonly IServiceScopeFactory _scopeFactory;
 
-    public CartService(ApplicationDbContext context)
+    public CartService(ApplicationDbContext context, IServiceScopeFactory scopeFactory)
     {
         _context = context;
+        _scopeFactory = scopeFactory;
     }
     
     //Add an Article to the card
-    public async Task addArticleToCart(int userId, int product_id, int quantity)
+    public void addArticleToCart(int userId, int product_id, int quantity)
     {
-        
         Cart cart = new Cart(userId, product_id, quantity);
-
-        _context.carts.Add(cart);
-        await _context.SaveChangesAsync();
-
+        
+        if (checkifProductAlreadyInCart(userId, product_id))
+        {
+            _context.Database.ExecuteSqlRaw("UPDATE carts SET quantity = quantity + {0} WHERE user_id = {1} AND product_id = {2}", quantity, userId, product_id);
+            _context.SaveChangesAsync();
+        }
+        else
+        {
+            _context.carts.Add(cart);
+            _context.SaveChangesAsync();
+        }
     }
 
     public Product getProduct(int productId)
@@ -36,25 +44,12 @@ public class CartService
         }
         return product;
     }
-
-    public static void calculateTotalPrice(Order order)
-    {
-        decimal? amount = 0;
-        
-        foreach (var articleAndQuantity in order.articleList )
-        {
-            foreach (var article in articleAndQuantity.Value)
-            {
-                amount += article.Value.ProductPricePerUnit * article.Key;
-            }
-            
-        }
-        order.setTotalAmount(amount);
-    }
     
     public async Task<Cart[]> getCart(int id)
     { 
-        Cart[] carts = await _context.carts.FromSqlRaw("SELECT * FROM carts WHERE user_id = {0}", id).ToArrayAsync();
+        using var scope = _scopeFactory.CreateScope(); // Erstelle einen neuen Scope
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        Cart[] carts = await dbContext.carts.FromSqlRaw("SELECT * FROM carts WHERE user_id = {0}", id).ToArrayAsync();
         return carts;
     }
 
@@ -109,5 +104,18 @@ public class CartService
             cartItems.Add(cartResponse);
         }
         return cartItems.ToArray();
+    }
+
+    public void removeCartFromDb(int getUserId)
+    {
+        _context.Database.ExecuteSqlRaw("DELETE FROM carts WHERE user_id = {0}", getUserId);
+    }
+    
+    private bool checkifProductAlreadyInCart(int userId, int productId)
+    {
+        var scope = _scopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var cart = dbContext.carts.FromSqlRaw("SELECT * FROM carts WHERE user_id = {0} AND product_id = {1}", userId, productId).ToArray();
+        return cart.Length > 0;
     }
 }

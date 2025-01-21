@@ -9,7 +9,7 @@ namespace Webshop.App.src.main.Models
     {
         [Key]
         [Column ("id")]
-        public int CustomerID { get; set; }
+        public int CustomerId { get; set; }
         
         [Required]
         [Column ("email")] 

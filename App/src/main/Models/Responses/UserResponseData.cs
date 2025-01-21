@@ -15,7 +15,7 @@ public class UserResponseData
     {
         try
         {
-            id = user.CustomerID;
+            id = user.CustomerId;
             email = user.Email;
             display_name = user.DisplayName;
         }

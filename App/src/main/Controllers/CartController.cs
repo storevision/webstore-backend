@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Text.Json.Nodes;
+using Microsoft.AspNetCore.Mvc;
 using Webshop.App.src.main.Models;
 using Webshop.App.src.main.Models.ApiHelper;
 using Webshop.App.src.main.Models.Responses;
@@ -14,12 +15,15 @@ namespace Webshop.App.src.main.Controllers
         
         private readonly CartService _cartService;
         private readonly AuthService _authService;
+        private readonly OrderService _orderService;
         private readonly IUserService _userService;
+        
     
-        public CartController(CartService cartService, AuthService authService, IUserService userService)
+        public CartController(CartService cartService, AuthService authService, OrderService orderService, IUserService userService)
         {
             _cartService = cartService;
             _authService = authService;
+            _orderService = orderService;
             _userService = userService;
             
         }
@@ -55,10 +59,11 @@ namespace Webshop.App.src.main.Controllers
         }
 
         [HttpPost("checkout")]
-        public IActionResult CheckoutCart([FromBody] Address address)
+        public IActionResult CheckoutCart([FromBody] AddressDto addressDto)
         {
-            bool success = true;
-            return Ok(success);
+            _orderService.createOrder(getUserId(), addressDto.address);
+            _cartService.removeCartFromDb(getUserId());
+            return Ok(new { success = true });
         }
 
         [HttpPost("clear")]
@@ -91,6 +96,11 @@ namespace Webshop.App.src.main.Controllers
         {
             public int product_id { get; set; }
             public int quantity { get; set; }
+        }
+        
+        public class AddressDto
+        {
+            public Models.Address address { get; set; }
         }
         
     }
