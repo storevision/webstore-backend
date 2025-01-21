@@ -17,6 +17,8 @@ WORKDIR /app
 # Kopiere die veröffentlichten Dateien aus der Build-Stage
 COPY --from=build /app/out ./
 
+COPY ./sql ./
+
 # Exponiere den Port, den die Anwendung nutzt
 EXPOSE 8080
 
