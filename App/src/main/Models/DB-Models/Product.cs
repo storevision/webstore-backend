@@ -60,8 +60,8 @@ public class Product
     public string? ImageHeight { get; set; }
     
     [JsonPropertyName("stock")]
-    [Column("stock")]
-    public int? Stock { get; set; }
+    [NotMapped]
+    public int Stock { get; set; }
     
     [JsonPropertyName("one_star")]
     [Column("one_star")]

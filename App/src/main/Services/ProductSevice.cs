@@ -7,15 +7,37 @@ namespace Webshop.Services;
 public class ProductService
 {
     private readonly ApplicationDbContext _context;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
 
-    public ProductService(ApplicationDbContext context)
+    public ProductService(ApplicationDbContext context, IServiceScopeFactory serviceScopeFactory)
     {
         _context = context;
+        _serviceScopeFactory = serviceScopeFactory;
     }
     
     public async Task<List<Product>> GetAllProductsAsync()
     {
-        return await _context.products.ToListAsync();
+        var scope = _serviceScopeFactory.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        
+        List<Product> productList = new List<Product>();
+        
+        Product[] products = await _context.products.ToArrayAsync();
+        Inventory[] inventorys = context.inventory.ToArray();
+        
+        foreach (Product product in products)
+        {
+            Inventory inventory = new Inventory();
+            inventory = inventorys.FirstOrDefault(i => i.ProductId == product.ProductId);
+            product.Stock = inventory.Quantity;
+            
+            
+            
+            productList.Add(product);
+        }
+        
+        
+        return productList;
     }
 
     // Methode: Produkt nach ID abrufen
