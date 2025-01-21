@@ -28,8 +28,6 @@ public class ProductController : ApiHelper
         try
         {
             var products = await _productService.GetAllProductsAsync();
-
-            var successResponse = new SuccessResponse<List<Product>>(products);
             
             return this.SendSuccess(products);
 
