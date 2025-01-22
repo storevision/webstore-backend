@@ -63,6 +63,7 @@ public class CartService
             cartItems[i].ProductId = cart[i].ProductId;
             cartItems[i].Quantity = cart[i].Quantity;
             cartItems[i].Product = getProduct(cart[i].ProductId);
+            cartItems[i].Product.Stock = _context.inventory.FromSqlRaw("SELECT * FROM inventory WHERE product_id = {0}", cart[i].ProductId).FirstOrDefault().Quantity;
         }
 
         return cartItems;
@@ -89,6 +90,9 @@ public class CartService
         var cart = this.getCart(userId);
 
         cartItems = this.getCartItems(cart.Result);
+        //Die Liste muss sortiert sein so das sie nach dem Produkt sortiert ist
+        Array.Sort(cartItems, (x, y) => x.Product.ProductId.CompareTo(y.Product.ProductId));
+        
         return cartItems;
     }
 

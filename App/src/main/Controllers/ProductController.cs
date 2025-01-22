@@ -15,11 +15,13 @@ public class ProductController : ApiHelper
   
     // Inject the ProductService
     private readonly ProductService _productService;
+    private readonly AuthService _authService;
 
     // When the ProductController is created, the ProductService is injected
-    public ProductController(ProductService productService)
+    public ProductController(ProductService productService, AuthService authService)
     {
         _productService = productService;
+        _authService = authService;
     }
     
     // Get all products
@@ -81,11 +83,11 @@ public class ProductController : ApiHelper
      */
 
     [HttpPost]
-    [Route("productReview/add")]
+    [Route("review/add")]
     public async Task<IActionResult> AddReview([FromBody] ProductReviewRequestBody productReview)
     {
-        _productService.AddProductReviewAsync(productReview.product_id, productReview.rating, productReview.comment);
-        return Ok();
+        _productService.addProductReviewAsync(productReview.product_id, productReview.rating, productReview.comment, getUserId());
+        return Ok(new { success = true });
     }
     
     /**
@@ -94,11 +96,11 @@ public class ProductController : ApiHelper
      */
     
     [HttpPost]
-    [Route("productReview/edit")]
+    [Route("review/edit")]
     public async Task<IActionResult> EditReview([FromBody] ProductReviewRequestBody productReview)
     {
-        _productService.EditProductReviewAsync(productReview.product_id, productReview.rating, productReview.comment);
-        return Ok();
+        _productService.updateProductReviewAsync(productReview.product_id, productReview.rating, productReview.comment, getUserId());
+        return Ok(new { success = true });
     }
     
     /**
@@ -110,7 +112,7 @@ public class ProductController : ApiHelper
     [Route("review/delete")]
     public async Task<IActionResult> DeleteReview(int product_id)
     {
-        _productService.DeleteProductReviewAsync(product_id);
+        _productService.DeleteProductReviewAsync(product_id, getUserId());
         return Ok();
     }
     
@@ -127,6 +129,25 @@ public class ProductController : ApiHelper
         public Product Product { get; set; }
         [JsonPropertyName("reviews")]
         public List<Review> Reviews { get; set; } = new List<Review>();
+    }
+    
+    private int getUserId()
+    {
+        var token = Request.Cookies["token"];
+        var userClaims = _authService.ValidateToken(token);
+            
+        try
+        {
+            if (userClaims == null)
+            {
+                throw new Exception("Token validation failed.");
+            }
+        }
+        catch (Exception e)
+        {
+            return -1;
+        }
+        return Convert.ToInt32(userClaims.FindFirst("id")?.Value);
     }
     
 }

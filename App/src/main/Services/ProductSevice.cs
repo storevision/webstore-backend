@@ -90,23 +90,38 @@ public class ProductService
             await _context.SaveChangesAsync();
         }
     }
-
-    // TODO needs to handle the given parameters to add a review referenced to the given product
-    public async Task AddProductReviewAsync(int id, int rating, string review)
+    
+    public async Task addProductReviewAsync(int id, int rating, string review, int userId)
     {
-        
+        await _context.reviews.AddAsync(new Review
+        {
+            ProductId = id,
+            CustomerId = userId,
+            Rating = rating,
+            Comment = review
+        });
+        _context.SaveChangesAsync();
     }
     
-    // TODO needs to handle the given parameters to edit the review referenced to the given product
-    public async Task EditProductReviewAsync(int id, int rating, string review)
+    public async Task updateProductReviewAsync(int id, int rating, string review, int userId)
     {
-        
+        var reviewToUpdate = await _context.reviews.FirstOrDefaultAsync(r => r.ProductId == id && r.CustomerId == userId);
+        if (reviewToUpdate != null)
+        {
+            reviewToUpdate.Rating = rating;
+            reviewToUpdate.Comment = review;
+            await _context.SaveChangesAsync();
+        }
     }
     
-    // TODO needs to handle the given parameters to delete a review referenced to the given product
-    public async Task DeleteProductReviewAsync(int productId)
+    public async Task DeleteProductReviewAsync(int productId, int userId)
     {
-        
+        var review = await _context.reviews.FirstOrDefaultAsync(r => r.ProductId == productId && r.CustomerId == userId);
+        if (review != null)
+        {
+            _context.reviews.Remove(review);
+            await _context.SaveChangesAsync();
+        }
     }
 
     public void getRatingDetailsForTheProdct(int productProductId, Product product)

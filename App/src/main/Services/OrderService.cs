@@ -28,14 +28,22 @@ public class OrderService
         
         Order order = new Order();
         decimal totalAmount = 0;
+        
         order.CustomerId = userId;
         var adress = _context.addresses.FirstOrDefault(a => a.CustomerId == userId);
         
         order.AddressId = adress.Addressid;
         
+        var allOrders = _context.orders.ToArray().ToList();
+        
         dbContext.orders.Add(order);
-         
-        Order newOrder = _context.orders.FirstOrDefault(o => o.CustomerId == userId && o.AddressId == adress.Addressid);
+        dbContext.SaveChanges();
+
+        var allOrdersToCompare = _context.orders.ToArray().ToList();
+
+        var uniqueOrder = allOrders.Concat(allOrdersToCompare).Distinct().ToList();
+        var orderId = uniqueOrder.Last().OrderId;
+        
         
         var cart = _context.carts.FromSqlRaw("SELECT * FROM carts WHERE user_id = {0}", userId).ToArray();
 
@@ -47,12 +55,12 @@ public class OrderService
             Order.Item orderItem = new Order.Item(item.ProductId, item.Quantity, product.ProductPricePerUnit);
             order.Items.Add(orderItem);
             totalAmount += orderItem.Price * item.Quantity;
-            createOrderDetailsForTheProduct(newOrder.OrderId, product, item.Quantity);
+            createOrderDetailsForTheProduct(orderId, product, item.Quantity);
             
         }
         
         order.TotalAmount = totalAmount;
-        _context.orders.Update(order);
+        dbContext.orders.Update(order);
         
         _context.SaveChanges();
     }
@@ -74,11 +82,11 @@ public class OrderService
     public List<Order> ListOrders(int userId)
     {
         List<Order> orderList = new List<Order>();
-        Order orderResponse = new Order();
         var orders = _context.orders.FromSqlRaw("SELECT * FROM orders WHERE user_id = {0}", userId).ToArray();
         
         foreach (var order in orders)
         {
+            Order orderResponse = new Order();
             orderResponse.OrderId = order.OrderId;
             var orderDetails = _context.orderDetails.FromSqlRaw("SELECT * FROM order_items WHERE order_id = {0}", order.OrderId).ToArray();
             foreach (var orderDetail in orderDetails)

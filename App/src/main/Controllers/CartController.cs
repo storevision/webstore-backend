@@ -30,19 +30,19 @@ namespace Webshop.App.src.main.Controllers
         
         // need to configure the error requests
         [HttpPost("add")]
-        public IActionResult AddToCart([FromBody] ReviewRequestBody reviewRequestBody)
+        public IActionResult AddToCart([FromBody] CartRequestBody cartRequestBody)
         {
             var userId = getUserId();
-            _cartService.addArticleToCart(userId, reviewRequestBody.product_id, reviewRequestBody.quantity);
+            _cartService.addArticleToCart(userId, cartRequestBody.product_id, cartRequestBody.quantity);
             Task<CartResponse[]> cartResponses = _cartService.getCartForUser(userId);
             return this.SendSuccess(cartResponses);
         }
 
-        [HttpPost("remove")]
-        public IActionResult RemoveFromCart([FromBody] ReviewRequestBody reviewRequestBody)
+        [HttpPost("clear")]
+        public IActionResult CLearCart([FromBody] CartRequestBody cartRequestBody)
         {
             var userId = getUserId();
-            _cartService.removeArticleFromCart(userId, reviewRequestBody.product_id, reviewRequestBody.quantity);
+            _cartService.removeArticleFromCart(userId, cartRequestBody.product_id, cartRequestBody.quantity);
             Task<CartResponse[]> cartResponses = _cartService.getCartForUser(userId);
             return this.SendSuccess(cartResponses);
         }
@@ -66,11 +66,13 @@ namespace Webshop.App.src.main.Controllers
             return Ok(new { success = true });
         }
 
-        [HttpPost("clear")]
-        public IActionResult ClearCart()
+        [HttpPost("remove")]
+        public IActionResult RemoveFromCart([FromBody] CartRequestBody cartRequestBody)
         {
-            // Logik wird später hinzugefügt
-            return Ok("Clear cart endpoint hit.");
+            var userId = getUserId();
+            _cartService.removeArticleFromCart(userId, cartRequestBody.product_id, cartRequestBody.quantity);
+            Task<CartResponse[]> cartResponses = _cartService.getCartForUser(userId);
+            return this.SendSuccess(cartResponses);
         }
         
         private int getUserId()
@@ -92,7 +94,7 @@ namespace Webshop.App.src.main.Controllers
             return Convert.ToInt32(userClaims.FindFirst("id")?.Value);
         }
         
-        public class ReviewRequestBody
+        public class CartRequestBody
         {
             public int product_id { get; set; }
             public int quantity { get; set; }
