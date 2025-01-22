@@ -74,9 +74,9 @@ using (var scope = app.Services.CreateScope())
     var sqlFilePath = "sql/test.sql"; // Pfad zur SQL-Datei
     if (File.Exists(sqlFilePath))
     {
-        //var sqlQuery = File.ReadAllText(sqlFilePath); // Inhalt der SQL-Datei einlesen
-        //var rowsModified = context.Database.ExecuteSqlRaw(sqlQuery); // SQL ausführen
-        //Console.WriteLine($"{rowsModified} rows were modified by the SQL script.");
+        var sqlQuery = File.ReadAllText(sqlFilePath); // Inhalt der SQL-Datei einlesen
+        var rowsModified = context.Database.ExecuteSqlRaw(sqlQuery); // SQL ausführen
+        Console.WriteLine($"{rowsModified} rows were modified by the SQL script.");
     }
     else
     {
