@@ -2,6 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using Webshop.App.src.main.Models;
 
+using System;
+using System.Drawing; // Namespace für Image
+using System.IO;
+using Webshop.Controllers;
+
 namespace Webshop.Services;
 
 public class ProductService
@@ -31,8 +36,6 @@ public class ProductService
             inventory = inventorys.FirstOrDefault(i => i.ProductId == product.ProductId);
             product.Stock = inventory.Quantity;
             
-            
-            
             productList.Add(product);
         }
         
@@ -43,7 +46,10 @@ public class ProductService
     // Methode: Produkt nach ID abrufen
     public async Task<Product?> GetProductByIdAsync(int id)
     {
-        return await _context.products.FirstOrDefaultAsync(p => p.ProductId == id);
+        Product product = await _context.products.FirstOrDefaultAsync(p => p.ProductId == id);
+        setImageWithAndHeight(product);
+        
+        return product;
     }
 
     public Product CreateProduct(string name, string description, decimal price)
@@ -102,5 +108,72 @@ public class ProductService
     {
         
     }
-    
+
+    public void getRatingDetailsForTheProdct(int productProductId, Product product)
+    {
+        var rating = _context.productRatings.Where(r => r.ProductId == productProductId).FirstOrDefault();
+
+        if (rating != null) 
+        {
+            product.TotalReviews = rating.TotalReviews;
+            product.AverageRating = rating.AverageRating;
+            product.OneStar = rating.OneStar;
+            product.TwoStars = rating.TwoStars;
+            product.ThreeStars = rating.ThreeStars;
+            product.FourStars = rating.FourStars;
+            product.FiveStars = rating.FiveStars;
+        }
+        else
+        {
+            product.TotalReviews = 0;
+            product.AverageRating = 0;
+            product.OneStar = 0;
+            product.TwoStars = 0;
+            product.ThreeStars = 0;
+            product.FourStars = 0;
+            product.FiveStars = 0;
+        }
+
+    }
+
+    private void setImageWithAndHeight(Product product)
+    {
+        string apiPath = product.ProductImage;
+        string filePath = apiPath.Replace("/api/assets/", "wwwroot/assets/");
+
+        // Prüfen, ob die Datei existiert
+        if (File.Exists(filePath))
+        {
+            // Bild laden und Maße auslesen
+            using (var image = Image.FromFile(filePath))
+            {
+                product.ImageWidth = image.Width.ToString();
+                product.ImageHeight = image.Height.ToString();
+            }
+        }
+        else
+        {
+            Console.WriteLine("Datei nicht gefunden!");
+        }
+    }
+
+    public void getStockForTheProduct(int productProductId, Product product)
+    {
+        var inventory = _context.inventory.Where(i => i.ProductId == productProductId).FirstOrDefault();
+        product.Stock = inventory.Quantity;
+    }
+
+    public void getReviewsForTheProduct(int productProductId, ProductController.ProductAndReviewResponse productAndReviewResponse)
+    {
+        var reviews = _context.reviews.Where(r => r.ProductId == productProductId).ToList();
+
+        foreach (var review in productAndReviewResponse.Reviews)
+        {
+            var user = _context.users.Where(u => u.CustomerId == review.CustomerId).FirstOrDefault();
+            review.UserDisplayName = user.DisplayName;
+            review.UserPictureDataUrl = user.PictureDataUrl;
+        }
+        
+        productAndReviewResponse.Reviews = reviews;
+    }
 }

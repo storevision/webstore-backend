@@ -16,6 +16,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<Inventory> inventory { get; set; }
     public DbSet<Address> addresses { get; set; }
     public DbSet<Cart> carts { get; set; }
+    public DbSet<Review> reviews { get; set; }
+    public DbSet<ProductRating> productRatings { get; set; }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -35,6 +37,17 @@ public class ApplicationDbContext : DbContext
         
         modelBuilder.Entity<OrderDetails>()
             .HasKey(o=> new {o.OrderId, o.ProductId});
+        
+        modelBuilder.Entity<Review>()
+            .HasKey(r => new { r.ProductId, r.CustomerId });
+        
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<ProductRating>(entity =>
+        {
+            entity.HasNoKey();
+            entity.ToTable("product_ratings", t => t.ExcludeFromMigrations());
+        });
         
     }
     

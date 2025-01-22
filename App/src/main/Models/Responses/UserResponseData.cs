@@ -23,6 +23,5 @@ public class UserResponseData
         {
             throw new Exception("No logged in user: " + e.Message);
         }
-        
     }
 }

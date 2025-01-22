@@ -7,7 +7,7 @@ namespace Webshop.App.src.main.Services;
 public class UserService : IUserService
 {
     private readonly ApplicationDbContext _context;
-    private IUserService _userServiceImplementation;
+    //private IUserService _userServiceImplementation;
 
     public UserService(ApplicationDbContext context)
     {

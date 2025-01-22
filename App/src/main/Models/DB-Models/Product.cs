@@ -51,9 +51,9 @@ public class Product
     [JsonIgnore]
     public Category Category { get; set; }
     
-    [JsonPropertyName("image_with")]
-    [Column("image_with")]
-    public string? ImageWith { get; set; }
+    [JsonPropertyName("image_width")]
+    [Column("image_width")]
+    public string? ImageWidth { get; set; }
     
     [JsonPropertyName("image_height")]
     [Column("image_height")]
@@ -67,21 +67,21 @@ public class Product
     [Column("one_star")]
     public int? OneStar { get; set; }
     
-    [JsonPropertyName("two_star")]
-    [Column("two_star")]
-    public int? TwoStar { get; set; }
+    [JsonPropertyName("two_stars")]
+    [Column("two_stars")]
+    public int? TwoStars { get; set; }
     
-    [JsonPropertyName("three_star")]
-    [Column("three_star")]
-    public int? ThreeStar { get; set; }
+    [JsonPropertyName("three_stars")]
+    [Column("three_stars")]
+    public int? ThreeStars { get; set; }
     
-    [JsonPropertyName("four_star")]
-    [Column("four_star")]
-    public int? FourStar { get; set; }
+    [JsonPropertyName("four_stars")]
+    [Column("four_stars")]
+    public int? FourStars { get; set; }
     
-    [JsonPropertyName("five_star")]
-    [Column("five_star")]
-    public int? FiveStar { get; set; }
+    [JsonPropertyName("five_stars")]
+    [Column("five_stars")]
+    public int? FiveStars { get; set; }
     
     [JsonPropertyName("total_reviews")]
     [Column("total_reviews")]
@@ -89,5 +89,5 @@ public class Product
     
     [JsonPropertyName("average_rating")]
     [Column("average_rating")]
-    public int? AverageRating { get; set; }
+    public decimal? AverageRating { get; set; }
 }

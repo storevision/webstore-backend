@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Webshop.App.src.main.Models.ApiHelper;
 using Webshop.App.src.main.Models.Responses;
@@ -39,16 +40,21 @@ public class ProductController : ApiHelper
     }
 
     // Get the selected product based on its id
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetProductById(int id)
+    [HttpGet("get")]
+    public async Task<IActionResult> GetProductById([FromQuery] int id)
     {
         var product = await _productService.GetProductByIdAsync(id);
         if (product == null)
         {
             return NotFound();
         }
+        ProductAndReviewResponse productAndReviewResponse = new ProductAndReviewResponse();
+        _productService.getRatingDetailsForTheProdct(product.ProductId, product);
+        _productService.getStockForTheProduct(product.ProductId, product);
+        _productService.getReviewsForTheProduct(product.ProductId, productAndReviewResponse);
+        productAndReviewResponse.Product = product;
 
-        return this.SendSuccess(product);
+        return this.SendSuccess(productAndReviewResponse);
     }
 
     // Unused
@@ -113,6 +119,14 @@ public class ProductController : ApiHelper
         public int product_id { get; set; }
         public int rating { get; set; }
         public string comment { get; set; }
+    }
+    
+    public class ProductAndReviewResponse
+    {
+        [JsonPropertyName("product")]
+        public Product Product { get; set; }
+        [JsonPropertyName("reviews")]
+        public List<Review> Reviews { get; set; } = new List<Review>();
     }
     
 }

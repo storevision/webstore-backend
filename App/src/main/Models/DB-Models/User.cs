@@ -16,10 +16,14 @@ namespace Webshop.App.src.main.Models
         // UNIQUE!!!
         public string? Email { get; set; }
         
+        [JsonPropertyName("user_picture_data_url")]
+        [Column("picture_data_url")]
+        public string? PictureDataUrl { get; set; }
+
         [Required]
         [JsonPropertyName("display_name")]
-        [Column ("display_name")]
-        public string  DisplayName { get; set; }
+        [Column("display_name")]
+        public string? DisplayName { get; set; } = "";
         
         // Passwort wird als Hash gespeichert
         private string PasswordHash = string.Empty;
