@@ -1,10 +1,8 @@
 ﻿using Webshop.Models.DB;
 using Microsoft.EntityFrameworkCore;
 using Webshop.App.src.main.Models;
+using SkiaSharp;
 
-using System;
-using System.Drawing; // Namespace für Image
-using System.IO;
 using Webshop.Controllers;
 
 namespace Webshop.Services;
@@ -160,10 +158,10 @@ public class ProductService
         if (File.Exists(filePath))
         {
             // Bild laden und Maße auslesen
-            using (var image = Image.FromFile(filePath))
+            using var bitmap = SKBitmap.Decode(filePath);
             {
-                product.ImageWidth = image.Width.ToString();
-                product.ImageHeight = image.Height.ToString();
+                product.ImageWidth = bitmap.Width.ToString();
+                product.ImageHeight = bitmap.Height.ToString();
             }
         }
         else
