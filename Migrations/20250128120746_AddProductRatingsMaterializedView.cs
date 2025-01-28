@@ -65,7 +65,7 @@ namespace Webshop.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     OrderId = table.Column<int>(type: "integer", nullable: false),
                     PaymentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    PaymentMethod = table.Column<string>(type: "text", nullable: false),
+                    PaymentMethod = table.Column<string>(type: "text", nullable: true),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
@@ -98,7 +98,7 @@ namespace Webshop.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     name = table.Column<string>(type: "text", nullable: false),
                     description = table.Column<string>(type: "text", nullable: false),
-                    image_url = table.Column<string>(type: "text", nullable: false),
+                    image_url = table.Column<string>(type: "text", nullable: true),
                     blurred_image = table.Column<string>(type: "text", nullable: true),
                     blurred_image_width = table.Column<int>(type: "integer", nullable: true),
                     blurred_image_height = table.Column<int>(type: "integer", nullable: true),
@@ -180,7 +180,7 @@ namespace Webshop.Migrations
                     product_id = table.Column<int>(type: "integer", nullable: false),
                     user_id = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    comment = table.Column<string>(type: "text", nullable: false),
+                    comment = table.Column<string>(type: "text", nullable: true),
                     rating = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
@@ -294,7 +294,6 @@ namespace Webshop.Migrations
             CREATE INDEX ON reviews (product_id);
             CREATE INDEX ON reviews (user_id);
         ");
-            
         }
 
         /// <inheritdoc />
@@ -335,7 +334,6 @@ namespace Webshop.Migrations
               DROP FUNCTION IF EXISTS refresh_product_ratings;
               DROP MATERIALIZED VIEW IF EXISTS product_ratings;
           ");
-            
         }
     }
 }

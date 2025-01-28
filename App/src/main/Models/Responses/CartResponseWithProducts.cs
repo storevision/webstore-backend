@@ -9,5 +9,5 @@ public class CartResponseWithProducts
     [JsonPropertyName("quantity")]
     public int Quantity { get; set; }
     [JsonPropertyName("product")]
-    public Product Product { get; set; }
+    public Product? Product { get; set; }
 }

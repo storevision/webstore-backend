@@ -35,7 +35,7 @@ public class ProductController : ApiHelper
             return this.SendSuccess(products);
 
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return this.SendError(HttpStatusCode.InternalServerError, "An error occurred while fetching the products.");
         }
@@ -50,7 +50,10 @@ public class ProductController : ApiHelper
         {
             return NotFound();
         }
-        ProductAndReviewResponse productAndReviewResponse = new ProductAndReviewResponse();
+        ProductAndReviewResponse productAndReviewResponse = new ProductAndReviewResponse
+        {
+            Product = null
+        };
         _productService.getRatingDetailsForTheProdct(product.ProductId, product);
         _productService.getStockForTheProduct(product.ProductId, product);
         _productService.getReviewsForTheProduct(product.ProductId, productAndReviewResponse);
@@ -61,10 +64,11 @@ public class ProductController : ApiHelper
 
     // Unused
     [HttpPost]
-    public async Task<IActionResult> Add([FromForm] string name, [FromForm] string description, [FromForm] decimal price)
+    public Task<IActionResult> Add([FromForm] string name, [FromForm] string description, [FromForm] decimal price)
     {
-        Product product = _productService.CreateProduct(name, description, price);
-        return Ok(product);
+        Task<Product> productTask = _productService.CreateProduct(name, description, price);
+        var product = productTask.Result;
+        return Task.FromResult<IActionResult>(Ok(product));
     }
 
     // Unused
@@ -86,8 +90,8 @@ public class ProductController : ApiHelper
     [Route("review/add")]
     public async Task<IActionResult> AddReview([FromBody] ProductReviewRequestBody productReview)
     {
-        _productService.addProductReviewAsync(productReview.product_id, productReview.rating, productReview.comment, getUserId());
-        return Ok(new { success = true });
+        await _productService.addProductReviewAsync(productReview.product_id, productReview.rating, productReview.comment, getUserId());
+        return await Task.FromResult<IActionResult>(Ok(new { success = true }));
     }
     
     /**
@@ -99,8 +103,8 @@ public class ProductController : ApiHelper
     [Route("review/edit")]
     public async Task<IActionResult> EditReview([FromBody] ProductReviewRequestBody productReview)
     {
-        _productService.updateProductReviewAsync(productReview.product_id, productReview.rating, productReview.comment, getUserId());
-        return Ok(new { success = true });
+        await _productService.updateProductReviewAsync(productReview.product_id, productReview.rating, productReview.comment, getUserId());
+        return await Task.FromResult<IActionResult>(Ok(new { success = true }));
     }
     
     /**
@@ -112,21 +116,21 @@ public class ProductController : ApiHelper
     [Route("review/delete")]
     public async Task<IActionResult> DeleteReview(int product_id)
     {
-        _productService.DeleteProductReviewAsync(product_id, getUserId());
-        return Ok();
+        await _productService.DeleteProductReviewAsync(product_id, getUserId());
+        return await Task.FromResult<IActionResult>(Ok());
     }
     
     public class ProductReviewRequestBody
     {
         public int product_id { get; set; }
         public int rating { get; set; }
-        public string comment { get; set; }
+        public string? comment { get; set; }
     }
     
     public class ProductAndReviewResponse
     {
         [JsonPropertyName("product")]
-        public Product Product { get; set; }
+        public required Product? Product { get; set; }
         [JsonPropertyName("reviews")]
         public List<Review> Reviews { get; set; } = new List<Review>();
     }
@@ -134,7 +138,7 @@ public class ProductController : ApiHelper
     private int getUserId()
     {
         var token = Request.Cookies["token"];
-        var userClaims = _authService.ValidateToken(token);
+        var userClaims = _authService.ValidateToken(token ?? throw new InvalidOperationException());
             
         try
         {
@@ -143,7 +147,7 @@ public class ProductController : ApiHelper
                 throw new Exception("Token validation failed.");
             }
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return -1;
         }

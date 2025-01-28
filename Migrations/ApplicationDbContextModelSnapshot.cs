@@ -221,7 +221,6 @@ namespace Webshop.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("PaymentMethod")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("PaymentId");
@@ -296,7 +295,6 @@ namespace Webshop.Migrations
                         .HasAnnotation("Relational:JsonPropertyName", "description");
 
                     b.Property<string>("ProductImage")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("image_url")
                         .HasAnnotation("Relational:JsonPropertyName", "image_url");
@@ -385,7 +383,6 @@ namespace Webshop.Migrations
                         .HasColumnName("user_id");
 
                     b.Property<string>("Comment")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("comment");
 

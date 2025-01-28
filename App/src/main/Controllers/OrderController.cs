@@ -37,7 +37,7 @@ namespace Webshop.App.src.main.Controllers
         private int getUserId()
         {
             var token = Request.Cookies["token"];
-            var userClaims = _authService.ValidateToken(token);
+            var userClaims = _authService.ValidateToken(token ?? throw new InvalidOperationException());
             
             try
             {
@@ -46,7 +46,7 @@ namespace Webshop.App.src.main.Controllers
                     throw new Exception("Token validation failed.");
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return -1;
             }

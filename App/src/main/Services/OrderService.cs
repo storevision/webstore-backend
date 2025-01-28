@@ -21,7 +21,7 @@ public class OrderService
         await _context.SaveChangesAsync();
     }
 
-    public void createOrder(int userId, Address address)
+    public void createOrder(int userId, Address? address)
     {
         var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -32,7 +32,14 @@ public class OrderService
         order.CustomerId = userId;
         var adress = _context.addresses.FirstOrDefault(a => a.CustomerId == userId);
         
+        if (adress != null)
+        {
         order.AddressId = adress.Addressid;
+        }
+        else
+        {
+            throw new InvalidOperationException("Address not found");
+        }
         
         var allOrders = _context.orders.ToArray().ToList();
         
@@ -51,6 +58,10 @@ public class OrderService
         {
             
             var product = _context.products.FirstOrDefault(p => p.ProductId == item.ProductId);
+            if (product == null)
+            {
+                throw new InvalidOperationException("Product not found");
+            }
             
             Order.Item orderItem = new Order.Item(item.ProductId, item.Quantity, product.ProductPricePerUnit);
             order.Items.Add(orderItem);

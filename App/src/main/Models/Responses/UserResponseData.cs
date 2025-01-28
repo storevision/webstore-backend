@@ -16,8 +16,8 @@ public class UserResponseData
         try
         {
             id = user.CustomerId;
-            email = user.Email;
-            display_name = user.DisplayName;
+            email = user.Email ?? throw new Exception("No email found");
+            display_name = user.DisplayName ?? throw new Exception("No display name found");
         }
         catch (Exception e)
         {

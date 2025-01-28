@@ -78,7 +78,7 @@ namespace Webshop.App.src.main.Controllers
         private int getUserId()
         {
             var token = Request.Cookies["token"];
-            var userClaims = _authService.ValidateToken(token);
+            var userClaims = _authService.ValidateToken(token ?? throw new InvalidOperationException("Token validation failed."));
             
             try
             {
@@ -87,7 +87,7 @@ namespace Webshop.App.src.main.Controllers
                     throw new Exception("Token validation failed.");
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return -1;
             }
@@ -102,7 +102,7 @@ namespace Webshop.App.src.main.Controllers
         
         public class AddressDto
         {
-            public Models.Address address { get; set; }
+            public Address? address { get; set; }
         }
         
     }

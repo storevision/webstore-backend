@@ -16,7 +16,7 @@ public class Product
     [Required]
     [Column("name")]
     [JsonPropertyName("name")]
-    public string ProductName { get; set; }
+    public string? ProductName { get; set; }
     
     [Required]
     [Column("description")]
@@ -25,7 +25,7 @@ public class Product
     
     [Column("image_url")]
     [JsonPropertyName("image_url")]
-    public string ProductImage { get; set; }
+    public string? ProductImage { get; set; }
     
     [Column("blurred_image")]
     [JsonPropertyName("blurred_image")]
@@ -49,7 +49,7 @@ public class Product
     public int CategoryId { get; set; }
     [ForeignKey("CategoryId")]
     [JsonIgnore]
-    public Category Category { get; set; }
+    public Category? Category { get; set; }
     
     [JsonPropertyName("image_width")]
     [Column("image_width")]

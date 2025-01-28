@@ -62,8 +62,8 @@ public class CartService
             cartItems[i] = new CartResponseWithProducts();
             cartItems[i].ProductId = cart[i].ProductId;
             cartItems[i].Quantity = cart[i].Quantity;
-            cartItems[i].Product = getProduct(cart[i].ProductId);
-            cartItems[i].Product.Stock = _context.inventory.FromSqlRaw("SELECT * FROM inventory WHERE product_id = {0}", cart[i].ProductId).FirstOrDefault().Quantity;
+            cartItems[i].Product = getProduct(cart[i].ProductId) ?? throw new InvalidOperationException("Product not found");
+            cartItems[i].Product.Stock = (int)_context.inventory.FromSqlRaw("SELECT * FROM inventory WHERE product_id = {0}", cart[i].ProductId).FirstOrDefault().Quantity;
         }
 
         return cartItems;

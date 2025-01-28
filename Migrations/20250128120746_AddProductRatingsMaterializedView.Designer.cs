@@ -12,7 +12,7 @@ using Webshop.Models.DB;
 namespace Webshop.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250122080519_AddProductRatingsMaterializedView")]
+    [Migration("20250128120746_AddProductRatingsMaterializedView")]
     partial class AddProductRatingsMaterializedView
     {
         /// <inheritdoc />
@@ -224,7 +224,6 @@ namespace Webshop.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("PaymentMethod")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("PaymentId");
@@ -299,7 +298,6 @@ namespace Webshop.Migrations
                         .HasAnnotation("Relational:JsonPropertyName", "description");
 
                     b.Property<string>("ProductImage")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("image_url")
                         .HasAnnotation("Relational:JsonPropertyName", "image_url");
@@ -388,7 +386,6 @@ namespace Webshop.Migrations
                         .HasColumnName("user_id");
 
                     b.Property<string>("Comment")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("comment");
 

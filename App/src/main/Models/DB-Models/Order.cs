@@ -27,7 +27,7 @@ public class Order
     // FK-Eigenschaft
     [JsonIgnore]
     [ForeignKey("CustomerId")]
-    public User User { get; set; }
+    public User? User { get; set; }
     
     [Column("address_id")]
     [JsonIgnore]
@@ -35,7 +35,7 @@ public class Order
     
     [JsonPropertyName("address")]
     [ForeignKey("AddressId")]
-    public Address Address { get; set; }
+    public Address? Address { get; set; }
     
     // The int Variable from the first dictionary is used to store the Product Id
     // the int in the inner dictionary is used for the quantity.

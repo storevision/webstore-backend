@@ -9,12 +9,12 @@ public class OrderDetails
     [Column("order_id")]
     public int OrderId { get; set; }
     [ForeignKey("OrderId")] 
-    public Order Order { get; set; }
+    public Order? Order { get; set; }
 
     [Column("product_id")]
     public int ProductId { get; set; }
     [ForeignKey("ProductId")]
-    public Product Product { get; set; }
+    public Product? Product { get; set; }
     
     [Column("quantity")]
     public int Quantity { get; set; }

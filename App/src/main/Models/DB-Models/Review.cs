@@ -13,18 +13,18 @@ public class Review
     [Column("product_id")]
     public int ProductId { get; set; }
     [ForeignKey("ProductId")]
-    public Product Product { get; set; }
+    public Product? Product { get; set; }
     
     [Column("user_id")]
     public int CustomerId { get; set; }
     [ForeignKey("CustomerId")]
-    public User User { get; set; }
+    public User? User { get; set; }
     
     [Column("created_at")]
     public DateTime Date { get; set; } = DateTime.UtcNow;
     
     [Column("comment")]
-    public string Comment { get; set; }
+    public string? Comment { get; set; }
     
     [Column("rating")]
     public decimal Rating { get; set; }
@@ -32,9 +32,9 @@ public class Review
     //Unmaped propertys
     [NotMapped]
     [JsonPropertyName("user_display_name")]
-    public string UserDisplayName { get; set; }
+    public required string UserDisplayName { get; set; }
     [NotMapped]
     [JsonPropertyName("user_picture_data_url")]
-    public string UserPictureDataUrl { get; set; }
+    public string? UserPictureDataUrl { get; set; }
     
 }

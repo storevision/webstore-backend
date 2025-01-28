@@ -80,7 +80,7 @@ public class UserController : ApiHelper
     [HttpGet("info")]
     public IActionResult Info()
     {
-        User requiredUser = null;
+        User requiredUser;
         var token = Request.Cookies["token"];
 
         if (string.IsNullOrEmpty(token))
@@ -96,16 +96,12 @@ public class UserController : ApiHelper
         }
 
         int value = Convert.ToInt32(userClaims.FindFirst("id")?.Value);
-        Task<User?> user = null;
+        Task<User?> user;
         
-        if (value != null)
-        {
-            user = _userService.GetUserByIdAsync(value);
-            requiredUser = user.Result;
-        }else
-        {
-            return this.SendError(HttpStatusCode.Unauthorized, "Token validation failed.");
-        }
+        
+        user = _userService.GetUserByIdAsync(value) ?? throw new InvalidOperationException("User not found.");
+        requiredUser = user.Result ?? throw new InvalidOperationException("User not found.");
+        
         // return user information as response
         return this.SendSuccess(new UserResponseData(requiredUser));
     }
@@ -118,8 +114,10 @@ public class UserController : ApiHelper
         {
             return this.SendError(HttpStatusCode.Unauthorized, "Token missing or invalid.");
         }
-        UserAddressResponse response = new UserAddressResponse();
-        response.Addresses = _userService.getUserAdresses(userId);
+        UserAddressResponse response = new UserAddressResponse
+        {
+            Addresses = _userService.getUserAdresses(userId)
+        };
         return this.SendSuccess(response);
     }
     
@@ -172,7 +170,7 @@ public class UserController : ApiHelper
     public class UserAddressResponse
     {
         [JsonPropertyName("addresses")]
-        public Address[] Addresses { get; set; }
+        public required Address[] Addresses { get; set; }
         
     }
 }

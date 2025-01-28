@@ -31,8 +31,8 @@ public class AuthService : IAuthService
             Subject = new ClaimsIdentity(new[]
             {
                 new Claim("id", user.CustomerId.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim("display_name", user.DisplayName)
+                new Claim(ClaimTypes.Email, user.Email ?? throw new InvalidOperationException("No email found")),
+                new Claim("display_name", user.DisplayName ?? throw new InvalidOperationException("No display name found"))
             }),
             Expires = keepLoggedIn ? DateTime.UtcNow.AddDays(30) : DateTime.UtcNow.AddDays(1),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

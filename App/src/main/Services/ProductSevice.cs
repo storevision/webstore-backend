@@ -31,8 +31,12 @@ public class ProductService
         foreach (Product product in products)
         {
             Inventory inventory = new Inventory();
-            inventory = inventorys.FirstOrDefault(i => i.ProductId == product.ProductId);
-            product.Stock = inventory.Quantity;
+            inventory = inventorys.FirstOrDefault(i => i.ProductId == product.ProductId) ?? throw new InvalidOperationException();
+            if (inventory.Quantity == null)
+            {
+                inventory.Quantity = 0;
+            }
+            product.Stock = (int)inventory.Quantity;
             
             productList.Add(product);
         }
@@ -44,24 +48,24 @@ public class ProductService
     // Methode: Produkt nach ID abrufen
     public async Task<Product?> GetProductByIdAsync(int id)
     {
-        Product product = await _context.products.FirstOrDefaultAsync(p => p.ProductId == id);
+        Product product = await _context.products.FirstOrDefaultAsync(p => p.ProductId == id) ?? throw new InvalidOperationException("Product not found");
         setImageWithAndHeight(product);
         
         return product;
     }
 
-    public Product CreateProduct(string name, string description, decimal price)
+    public async Task<Product> CreateProduct(string name, string description, decimal price)
     {
         Product product = new Product();
         product.ProductName = name;
         product.ProductDescription = description;
         product.ProductPricePerUnit = price;
-        AddProductAsync(product);
+        await AddProductAsync(product);
         return product;
     }
 
     // Methode: Neues Produkt hinzufügen
-    public async Task AddProductAsync(Product product)
+    private async Task AddProductAsync(Product product)
     {
         _context.products.Add(product);
         await _context.SaveChangesAsync();
@@ -89,19 +93,23 @@ public class ProductService
         }
     }
     
-    public async Task addProductReviewAsync(int id, int rating, string review, int userId)
+    public async Task addProductReviewAsync(int id, int rating, string? review, int userId)
     {
+        var scope = _serviceScopeFactory.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         await _context.reviews.AddAsync(new Review
         {
             ProductId = id,
             CustomerId = userId,
             Rating = rating,
-            Comment = review
+            Comment = review,
+            UserDisplayName = context.users.Where(u => u.CustomerId == userId).FirstOrDefault().DisplayName ?? throw new InvalidOperationException()
+
         });
-        _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
     }
     
-    public async Task updateProductReviewAsync(int id, int rating, string review, int userId)
+    public async Task updateProductReviewAsync(int id, int rating, string? review, int userId)
     {
         var reviewToUpdate = await _context.reviews.FirstOrDefaultAsync(r => r.ProductId == id && r.CustomerId == userId);
         if (reviewToUpdate != null)
@@ -173,7 +181,14 @@ public class ProductService
     public void getStockForTheProduct(int productProductId, Product product)
     {
         var inventory = _context.inventory.Where(i => i.ProductId == productProductId).FirstOrDefault();
-        product.Stock = inventory.Quantity;
+        if (inventory == null)
+        {
+            throw new InvalidOperationException("Inventory not found");
+        } else if (inventory.Quantity == null)
+        {
+            product.Stock = (int)inventory.Quantity;   
+        }
+        
     }
 
     public void getReviewsForTheProduct(int productProductId, ProductController.ProductAndReviewResponse productAndReviewResponse)
