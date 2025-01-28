@@ -30,7 +30,7 @@ public class AuthService : IAuthService
         {
             Subject = new ClaimsIdentity(new[]
             {
-                new Claim("id", user.CustomerID.ToString()),
+                new Claim("id", user.CustomerId.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim("display_name", user.DisplayName)
             }),

@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Net;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Webshop.App.src.main.Models;
 using Webshop.App.src.main.Models.ApiHelper;
@@ -108,6 +110,51 @@ public class UserController : ApiHelper
         return this.SendSuccess(new UserResponseData(requiredUser));
     }
     
+    [HttpGet("settings")]
+    public IActionResult Settings()
+    {
+        var userId = getUserId();
+        if (userId == -1)
+        {
+            return this.SendError(HttpStatusCode.Unauthorized, "Token missing or invalid.");
+        }
+        UserAddressResponse response = new UserAddressResponse();
+        response.Addresses = _userService.getUserAdresses(userId);
+        return this.SendSuccess(response);
+    }
+    
+    [HttpPost("settings")]
+    public IActionResult Settings([FromBody] UserAddressResponse addressList)
+    {
+        var userId = getUserId();
+        if (userId == -1)
+        {
+            return this.SendError(HttpStatusCode.Unauthorized, "Token missing or invalid.");
+        }
+        var address = addressList.Addresses[0];
+        _userService.addUserAddress(userId, address);
+        return this.SendSuccess(new {success = true});
+    }
+    
+    private int getUserId()
+    {
+        var token = Request.Cookies["token"];
+        var userClaims = _authService.ValidateToken(token);
+            
+        try
+        {
+            if (userClaims == null)
+            {
+                throw new Exception("Token validation failed.");
+            }
+        }
+        catch (Exception e)
+        {
+            return -1;
+        }
+        return Convert.ToInt32(userClaims.FindFirst("id")?.Value);
+    }
+    
     public class RegisterRequestBody
     {
         public string email { get; set; }
@@ -120,5 +167,12 @@ public class UserController : ApiHelper
         public string email { get; set; }
         public string password { get; set; }
         public bool keepLoggedIn { get; set; }
+    }
+
+    public class UserAddressResponse
+    {
+        [JsonPropertyName("addresses")]
+        public Address[] Addresses { get; set; }
+        
     }
 }

@@ -1,14 +1,13 @@
 ﻿using Webshop.App.src.main.Models;
 using Webshop.Models.DB;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace Webshop.App.src.main.Services;
 
 public class UserService : IUserService
 {
     private readonly ApplicationDbContext _context;
-    private IUserService _userServiceImplementation;
+    //private IUserService _userServiceImplementation;
 
     public UserService(ApplicationDbContext context)
     {
@@ -30,7 +29,7 @@ public class UserService : IUserService
 
     public async Task<User?> GetUserByIdAsync(int id)
     {
-        return await _context.users.FirstOrDefaultAsync(u => u.CustomerID == id);
+        return await _context.users.FirstOrDefaultAsync(u => u.CustomerId == id);
     }
 
     // Benutzeranmeldung validieren
@@ -59,8 +58,27 @@ public class UserService : IUserService
             return false;
         }
 
-        var user = await _context.users.FirstOrDefaultAsync(u => u.CustomerID == userId && u.Email == tokenUser.Email);
+        var user = await _context.users.FirstOrDefaultAsync(u => u.CustomerId == userId && u.Email == tokenUser.Email);
 
         return user != null;
+    }
+    
+    public Address[] getUserAdresses(int userId)
+    {
+        List<Address> addressList = new List<Address>();
+        Address[] addresses = _context.addresses.FromSqlRaw("SELECT * FROM addresses WHERE user_id = {0}", userId).ToArray();
+        foreach (var address in addresses)
+        {
+            addressList.Add(address);
+        }
+        
+        return addressList.ToArray();
+    }
+    
+    public void addUserAddress(int userId, Address address)
+    {
+        address.CustomerId = userId;
+        _context.addresses.Add(address);
+        _context.SaveChanges();
     }
 }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Webshop.App.src.main.Models;
 
-namespace Webshop.Models.Products;
+namespace Webshop.App.src.main.Models;
 
 [Table("products")]
 public class Product
@@ -51,4 +51,43 @@ public class Product
     [JsonIgnore]
     public Category Category { get; set; }
     
+    [JsonPropertyName("image_width")]
+    [Column("image_width")]
+    public string? ImageWidth { get; set; }
+    
+    [JsonPropertyName("image_height")]
+    [Column("image_height")]
+    public string? ImageHeight { get; set; }
+    
+    [JsonPropertyName("stock")]
+    [NotMapped]
+    public int Stock { get; set; }
+    
+    [JsonPropertyName("one_star")]
+    [Column("one_star")]
+    public int? OneStar { get; set; }
+    
+    [JsonPropertyName("two_stars")]
+    [Column("two_stars")]
+    public int? TwoStars { get; set; }
+    
+    [JsonPropertyName("three_stars")]
+    [Column("three_stars")]
+    public int? ThreeStars { get; set; }
+    
+    [JsonPropertyName("four_stars")]
+    [Column("four_stars")]
+    public int? FourStars { get; set; }
+    
+    [JsonPropertyName("five_stars")]
+    [Column("five_stars")]
+    public int? FiveStars { get; set; }
+    
+    [JsonPropertyName("total_reviews")]
+    [Column("total_reviews")]
+    public int? TotalReviews { get; set; }
+    
+    [JsonPropertyName("average_rating")]
+    [Column("average_rating")]
+    public decimal? AverageRating { get; set; }
 }

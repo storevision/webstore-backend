@@ -3,11 +3,10 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /app
 
 # Kopiere die Projektdateien und restore Dependencies
-COPY *.csproj ./
+COPY . ./
 RUN dotnet restore
 
-# Kopiere den Rest des Codes und baue die Anwendung
-COPY . ./
+# Baue die Anwendung
 RUN dotnet publish -c Release -o out
 
 # Runtime-Stage
@@ -17,7 +16,12 @@ WORKDIR /app
 # Kopiere die veröffentlichten Dateien aus der Build-Stage
 COPY --from=build /app/out ./
 
-# Exponiere den Port, den die Anwendung nutzt
+# Kopiere die benötigten Umgebungsdateien und SQL-Skripte
+COPY backend.env ./
+COPY ./sql ./sql
+
+# Setze den Port und sicherstelle, dass der richtige verwendet wird
+ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
 
 # Startpunkt für die Anwendung

@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using Webshop.Models.Cart;
 
 namespace Webshop.App.src.main.Models
 {
@@ -10,17 +9,21 @@ namespace Webshop.App.src.main.Models
     {
         [Key]
         [Column ("id")]
-        public int CustomerID { get; set; }
+        public int CustomerId { get; set; }
         
         [Required]
         [Column ("email")] 
         // UNIQUE!!!
         public string? Email { get; set; }
         
+        [JsonPropertyName("user_picture_data_url")]
+        [Column("picture_data_url")]
+        public string? PictureDataUrl { get; set; }
+
         [Required]
         [JsonPropertyName("display_name")]
-        [Column ("display_name")]
-        public string  DisplayName { get; set; }
+        [Column("display_name")]
+        public string? DisplayName { get; set; } = "";
         
         // Passwort wird als Hash gespeichert
         private string PasswordHash = string.Empty;

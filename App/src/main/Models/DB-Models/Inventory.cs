@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
-using Webshop.Models.Products;
 
 namespace Webshop.App.src.main.Models;
 
@@ -16,6 +14,8 @@ public class Inventory
     [Column("quantity")]
     public int Quantity { get; set; }
     
-    [ForeignKey("product_id")]
+    [Column("product_id")]
+    public int ProductId { get; set; }
+    [ForeignKey("ProductId")]
     public Product Product { get; set; }
 }
